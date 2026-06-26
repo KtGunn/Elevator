@@ -1,0 +1,22 @@
+[
+  {
+    "number": 0,
+    "front": true,
+    "rear": false
+  },
+  {
+    "number": 1,
+    "front": true,
+    "rear": false
+  },
+  {
+    "number": 2,
+    "front": true,
+    "rear": false
+  },
+  {
+    "number": 3,
+    "front": true,
+    "rear": true
+  }
+]
