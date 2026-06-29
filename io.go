@@ -6,22 +6,26 @@ import (
 	"encoding/json"
 )
 
+var Levels []*Level
 
-func ReadLevels(fname string) ([]*Level, error) {
+
+func ReadLevels(fname string)  error {
 
 	file, err := os.Open(fname)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer file.Close()
 
 	var levels []*Level
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&levels); err != nil {
-		return nil, err
+		return err
 	}
 
-	return levels, nil
+	Levels = levels
+	
+	return nil
 }
 
 func ShowLevels(levels []*Level) {

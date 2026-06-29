@@ -34,6 +34,15 @@ type Level struct {
 
 
 //
+type ElevatorDimensions struct {
+	floor       FloorDimensions
+	positions   []CarPosition
+}
+
+func NewDims() ElevatorDimensions {
+	return ElevatorDimensions{}
+}
+
 type FloorDimensions struct {
 	hallLength   int
 	lobbyLength  int
