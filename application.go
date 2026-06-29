@@ -30,11 +30,16 @@ func CreateAppInstance(windowDims fyne.Size, levels []*Level) {
   ApplicationInstance = NewApp(windowDims)
 	cabin := CreateElevatorCabin(windowDims, levels)
 
+	cab := container.NewWithoutLayout(cabin.background)
+	cab.Add(cabin.floors)
+	cab.Add(cabin.car)
+	
 	content := container.NewVBox(
-		cabin,
+		cab,
 	)
 	ApplicationInstance.win.SetContent(content)
-	
+
+	ApplicationInstance.app.ShowRun()
 }
 
 func NewApp(windowDims fyne.Size) Application {
