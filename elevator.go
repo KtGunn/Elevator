@@ -37,6 +37,8 @@ func NewElevatorCabin() ElevatorCabin {
 // CreateElevatorCabin
 // creates all objects needed to render an elevator cabin
 //
+//  NewDims() returns {floor: FloorDimensions, positions: []CarPosition}
+
 func CreateElevatorCabin(dims fyne.Size, levels []*Level) ElevatorCabin {
 
 	elevDims := NewDims()
@@ -54,6 +56,7 @@ func Background(dims fyne.Size) *fyne.Container {
 
 	backgroundbox := canvas.NewRectangle(DARK)
 	backgroundbox.Resize(dims)
+	backgroundbox.SetMinSize(dims)
 
 	return container.NewWithoutLayout(backgroundbox)
 }
