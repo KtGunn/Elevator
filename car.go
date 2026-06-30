@@ -80,14 +80,14 @@ func (c Car) CloseDoor(which int) {
 	}
 }
 
-func (c Car) SetToFloor(floor int) {
-	for _, carPos := range CarPositions {
+func (c Car) SetToFloor(floor int, positions []CarPosition) (float32, float32){
+
+	for _, carPos := range positions {
 		if carPos.level == floor {
-			pos := fyne.NewPos(float32(carPos.xPixCoord), float32(c.yOffset-carPos.yPixCoord-c.carHeight))
-			c.container.Move(pos)
-			return
+			return float32(carPos.xPixCoord), float32(carPos.yPixCoord + c.carHeight)
 		}
 	}
+	return -1, -1
 }
 
 

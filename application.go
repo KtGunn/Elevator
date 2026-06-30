@@ -27,26 +27,20 @@ func NewApplication() Application {
 func CreateAppInstance(windowDims fyne.Size, levels []*Level) {
 
   ApplicationInstance = NewApp(windowDims)
-	CreateElevatorCabin(windowDims, levels)
-	//cabin := CreateElevatorCabin(windowDims, levels)
 
-	/*
+	cabin := CreateElevatorCabin(windowDims, levels)
+	
 	cab := container.NewWithoutLayout(cabin.background)
-	cab.Add(cabin.floors)
-	cab.Add(cabin.car)
-
-	cabin2 := CreateElevatorCabin(windowDims, levels)
-	cab2 := container.NewWithoutLayout(cabin2.background)
-	cab2.Add(cabin2.floors)
-	cab2.Add(cabin2.car)
+	cab.Add(cabin.car.container)
+	cabin.Place(1, windowDims.Height)
 
 	content := container.NewHBox(
-		cab, cab2,
+		cab,
 	)
+
 	ApplicationInstance.win.SetContent(content)
 	ApplicationInstance.win.Resize(fyne.NewSize(windowDims.Width*2, windowDims.Height))
 	ApplicationInstance.win.ShowAndRun()
-	*/
 }
 
 func NewApp(windowDims fyne.Size) Application {

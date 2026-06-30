@@ -31,7 +31,15 @@ func NewElevatorCabin() ElevatorCabin {
 	return ElevatorCabin{}
 }
 
+func (e ElevatorCabin) Place(floor int, yOffset float32 ) {
 
+	xPix, yPix := e.car.SetToFloor(floor, e.dimensions.positions)
+	if xPix < 0 && yPix < 0 {
+		return
+	}
+	
+	e.car.container.Move(fyne.NewPos(xPix, yOffset - yPix))
+}
 
 //////////////////////////////////////////////////////////////
 // CarPositions
@@ -83,7 +91,7 @@ func Background(dims fyne.Size, floorDims FloorDimensions, levels []*Level) *fyn
 	for index, level := range levels {
 
 		height := index*floorDims.floorHeight + floorDims.bottomLevel
-		flObj := CreateFloorObject(ycoordOffset, height, floorDims, level.Front, level.Rear)
+		flObj := CreateFloorObject(int(dims.Height), height, floorDims, level.Front, level.Rear)
 
 		for _, obj := range flObj {
 			cont.Add(obj)
