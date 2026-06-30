@@ -9,19 +9,11 @@ import (
 )
 
 
-// CarPositions
-// holds xy-pixel coords of car position at floors
-var CarPositions []CarPosition
-
-// CarContainer
-// holds the objects that define a car
-var CarContainer *fyne.Container
 
 type CarObjects struct {
 	box   fyne.CanvasObject
 	front fyne.CanvasObject
 	rear  fyne.CanvasObject
-
 }
 
 func NewCarObjects() *CarObjects {
@@ -29,7 +21,7 @@ func NewCarObjects() *CarObjects {
 }
 
 
-func CreateCar(floorDims FloorDimensions) *fyne.Container{
+func CreateCarObjects(floorDims FloorDimensions) (*CarObjects, *fyne.Container) {
 	box := container.NewWithoutLayout()
 	var doorWidth float32 = 8
 
@@ -56,5 +48,5 @@ func CreateCar(floorDims FloorDimensions) *fyne.Container{
 	box.Add(car.front)
 	box.Add(car.rear)
 
-	return box
+	return car, box
 }

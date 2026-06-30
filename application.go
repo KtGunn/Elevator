@@ -11,7 +11,6 @@ import (
 
 var yOffset int
 
-
 var ApplicationInstance Application
 
 type Application struct {

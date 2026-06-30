@@ -34,6 +34,12 @@ func NewElevatorCabin() ElevatorCabin {
 
 
 //////////////////////////////////////////////////////////////
+// CarPositions
+// holds xy-pixel coords of car position at floors
+var CarPositions []CarPosition
+
+
+//////////////////////////////////////////////////////////////
 // CreateElevatorCabin
 // creates all objects needed to render an elevator cabin
 //
@@ -47,7 +53,7 @@ func CreateElevatorCabin(dims fyne.Size, levels []*Level) ElevatorCabin {
 	newCabin := NewElevatorCabin()
 	newCabin.floors = FloorsContainer(dims, elevDims.floor, levels)
 	newCabin.background = Background(dims)
-	newCabin.car = NewCar(elevDims.floor)
+	newCabin.car = CabinCar(elevDims.floor)
 
 	return newCabin
 }
