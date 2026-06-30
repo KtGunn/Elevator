@@ -27,7 +27,10 @@ func NewApplication() Application {
 func CreateAppInstance(windowDims fyne.Size, levels []*Level) {
 
   ApplicationInstance = NewApp(windowDims)
-	cabin := CreateElevatorCabin(windowDims, levels)
+	CreateElevatorCabin(windowDims, levels)
+	//cabin := CreateElevatorCabin(windowDims, levels)
+
+	/*
 	cab := container.NewWithoutLayout(cabin.background)
 	cab.Add(cabin.floors)
 	cab.Add(cabin.car)
@@ -43,7 +46,7 @@ func CreateAppInstance(windowDims fyne.Size, levels []*Level) {
 	ApplicationInstance.win.SetContent(content)
 	ApplicationInstance.win.Resize(fyne.NewSize(windowDims.Width*2, windowDims.Height))
 	ApplicationInstance.win.ShowAndRun()
-
+	*/
 }
 
 func NewApp(windowDims fyne.Size) Application {

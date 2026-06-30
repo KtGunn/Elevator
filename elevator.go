@@ -22,9 +22,9 @@ var (
 // ElevatorCabin
 //
 type ElevatorCabin struct {
-	car        *fyne.Container
-	floors     *fyne.Container
+	car Car
 	background *fyne.Container
+	dimensions ElevatorDimensions
 }
 
 func NewElevatorCabin() ElevatorCabin {
@@ -46,59 +46,53 @@ var CarPositions []CarPosition
 //  NewDims() returns {floor: FloorDimensions, positions: []CarPosition}
 
 func CreateElevatorCabin(dims fyne.Size, levels []*Level) ElevatorCabin {
-
-	elevDims := NewDims()
-	elevDims.floor, elevDims.positions = ElevatorDims(dims, elevDims.floor,levels)
+	log.Println("New elevator cabin")
 
 	newCabin := NewElevatorCabin()
-	newCabin.floors = FloorsContainer(dims, elevDims.floor, levels)
-	newCabin.background = Background(dims)
-	newCabin.car = CabinCar(elevDims.floor)
+	newCabin.dimensions = ElevatorDims(dims,levels)
+
+	newCabin.background = Background(dims, newCabin.dimensions.floor, levels)
+	newCabin.car = CabinCar(newCabin.dimensions.floor)
 
 	return newCabin
 }
 
-func Background(dims fyne.Size) *fyne.Container {
+func ElevatorDims(winDims fyne.Size, floors []*Level) ElevatorDimensions {
 
+	dims := NewDims()
+	dims.floor = SetDimensions(int(winDims.Height), int(winDims.Width), len(floors))
+	dims.positions = SetCarPositions(floors, dims.floor)
+
+	return dims
+}
+
+func Background(dims fyne.Size, floorDims FloorDimensions, levels []*Level) *fyne.Container {
+
+	cont := container.NewWithoutLayout()
+
+	// Background rectangle
+	//
 	backgroundbox := canvas.NewRectangle(DARK)
 	backgroundbox.Resize(dims)
 	backgroundbox.SetMinSize(dims)
+	cont.Add(backgroundbox)
+	
 
-	return container.NewWithoutLayout(backgroundbox)
-}
-
-func ElevatorDims(winDims fyne.Size, floorDims FloorDimensions, floors []*Level) (FloorDimensions, []CarPosition){
-
-	floorDims = SetDimensions(int(winDims.Height), int(winDims.Width), len(floors))
-	carPositions := SetCarPositions(floors, floorDims)
-
-	return floorDims, carPositions
-}
-
-
-func FloorsContainer(dims fyne.Size, floorDims FloorDimensions, levels []*Level) *fyne.Container {
-	vBox := CreateFloors(int(dims.Height), floorDims, levels)
-	vBox.Resize(fyne.NewSize(dims.Width, dims.Height))
-	return vBox
-}
-
-func CreateFloors(ycoordOffset int, floorDims FloorDimensions, levels []*Level) *fyne.Container {
-	log.Println("Creating floors.")
-
-	vbox := container.NewWithoutLayout()
-
+	// Floors
+	//
 	for index, level := range levels {
 
 		height := index*floorDims.floorHeight + floorDims.bottomLevel
 		flObj := CreateFloorObject(ycoordOffset, height, floorDims, level.Front, level.Rear)
 
 		for _, obj := range flObj {
-			vbox.Add(obj)
+			cont.Add(obj)
 		}
 	}
 
-	return vbox
+	return cont
 }
+
 
 func CreateFloorObject(yOff int, yLevel int, floorDims FloorDimensions, front bool, rear bool) []fyne.CanvasObject {
 

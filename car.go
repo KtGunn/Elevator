@@ -92,7 +92,7 @@ func (c Car) SetToFloor(floor int) {
 
 
 
-func CabinCar(floorDims FloorDimensions) *fyne.Container {
+func CabinCar(floorDims FloorDimensions) Car {
 	log.Println("Creating a new car")
 
 	car := NewCar()
@@ -100,5 +100,5 @@ func CabinCar(floorDims FloorDimensions) *fyne.Container {
 	car.carHeight = floorDims.boxHeight
 	car.yOffset = yOffset
 
-	return car.container
+	return car
 }
