@@ -6,17 +6,17 @@ import (
 
 
 
-func SetDimensions(graphicsHeight int, graphicsWidth int, floors int) FloorDimensions {
+func SetDimensions(boxHeight int, boxWidth int, floors int) FloorDimensions {
 
 	var floorDims FloorDimensions = FloorDimensions{
 		floors: floors,
 	}
 
 	floorDims.floorHeight, floorDims.boxHeight, floorDims.bottomLevel =
-		FloorAndCabHeights(graphicsHeight, graphicsWidth, floorDims.floors)
+		FloorAndCabHeights(boxHeight, boxWidth, floorDims.floors)
 
 	floorDims.carLength, floorDims.lobbyLength, floorDims.hallLength =
-		AllocateDimensions(int(graphicsHeight), int(graphicsWidth))
+		AllocateDimensions(int(boxHeight), int(boxWidth))
 
 	return floorDims
 }
