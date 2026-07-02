@@ -86,7 +86,7 @@ func SetCarPositions(levels []*Level, floorDims FloorDimensions) []CarPosition {
 	carPositions := []CarPosition{}
 	xCoord := floorDims.hallLength + floorDims.lobbyLength
 	
-	for _, level := range Levels {
+	for _, level := range levels {
 		number := int(level.Number)
 		yCoord := number*floorDims.floorHeight + floorDims.bottomLevel
 		carPositions = append(carPositions, CarPosition{
@@ -97,4 +97,22 @@ func SetCarPositions(levels []*Level, floorDims FloorDimensions) []CarPosition {
 	}
 
 	return carPositions
+}
+
+
+
+func CabinToLevels(landings []*Landing) []*Level {
+
+	var levels []*Level
+
+	for _, landing := range landings {
+		level := &Level{
+			Number: int32(landing.Floor),
+			Front: landing.Door == 0 || landing.Door == 2,
+			Rear:  landing.Door == 2 || landing.Door == 1,
+		}
+		levels = append(levels, level)
+	}
+
+	return levels
 }

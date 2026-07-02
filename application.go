@@ -18,28 +18,52 @@ type Application struct {
 	win  fyne.Window
 	dims fyne.Size
 }
-
 func NewApplication() Application {
 	return Application{}
 }
 
 
-var Cabins []ElevatorCabin
+var CabinObjects []CabinObject
 
-func CreateAppInstance(windowDims fyne.Size, levels []*Level) {
+type CabinObject struct {
+	elevator ElevatorCabin
+	bank string
+	cabin string
+}
+func NewCabinObject (bank string, cabin string) CabinObject {
+	return CabinObject{
+		bank: bank,
+		cabin: cabin,
+	}
+}
+
+
+
+
+
+func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 
   ApplicationInstance = NewApp(windowDims)
 
-	cabin := CreateElevatorCabin(windowDims, levels)
-	Cabins = append(Cabins, cabin)
+	content := container.NewHBox()
 	
-	cab := container.NewWithoutLayout(cabin.background)
-	cab.Add(cabin.car.container)
-	cabin.Place(1, windowDims.Height)
+	for _, bank := range banks {
+		for _, car := range bank.Cars {
 
-	content := container.NewHBox(
-		cab,
-	)
+			cabinObj := NewCabinObject(bank.Name, car.Name)
+			levels := CabinToLevels(car.Landings)
+
+			cabinObj.elevator = CreateElevatorCabin(windowDims, levels)
+			
+			cab := container.NewWithoutLayout(cabinObj.elevator.background)
+			cab.Add(cabinObj.elevator.car.container)
+			cabinObj.elevator.Place(0, windowDims.Height)
+			content.Add(cab)
+			
+			CabinObjects = append(CabinObjects, cabinObj)
+		}
+	}
+
 
 	ApplicationInstance.win.SetContent(content)
 	ApplicationInstance.win.Resize(fyne.NewSize(windowDims.Width*2, windowDims.Height))

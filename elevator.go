@@ -41,10 +41,13 @@ func (e ElevatorCabin) Place(floor int, yOffset float32 ) {
 	e.car.container.Move(fyne.NewPos(xPix, yOffset - yPix))
 }
 
+
+
 //////////////////////////////////////////////////////////////
 // CarPositions
 // holds xy-pixel coords of car position at floors
 var CarPositions []CarPosition
+
 
 
 //////////////////////////////////////////////////////////////
@@ -65,6 +68,8 @@ func CreateElevatorCabin(dims fyne.Size, levels []*Level) ElevatorCabin {
 	return newCabin
 }
 
+// ElevatorDims
+//
 func ElevatorDims(winDims fyne.Size, floors []*Level) ElevatorDimensions {
 
 	dims := NewDims()
@@ -74,6 +79,9 @@ func ElevatorDims(winDims fyne.Size, floors []*Level) ElevatorDimensions {
 	return dims
 }
 
+
+// Background
+//
 func Background(dims fyne.Size, floorDims FloorDimensions, levels []*Level) *fyne.Container {
 
 	cont := container.NewWithoutLayout()
@@ -150,6 +158,12 @@ func CreateALine(color color.RGBA, yOff int, position fyne.Position, width int, 
 	return anyLine, position
 }
 
+
+// flipVertical
+//   this is a quick coordinates transformation.
+//   Screen coords start at top-left, x  positive right and y position down.
+//   The application sets origin at bottom left, x  positive right and y position UP.
+//
 func flipVertical(height int, pos fyne.Position) fyne.Position {
 	return fyne.Position{
 		X: pos.X,
