@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	//"log"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -60,31 +60,5 @@ func NewApp(windowDims fyne.Size) Application {
 }
 
 
-func DoCanvas(levels []*Level, windowDims fyne.Size) (fyne.App, fyne.Window) {
-	log.Println("DoCanvas")
-
-	/*	
-	CarContainer = CreateCar(floorDims)
-	
-	backgroundbox := CreateBackgroundbox(float32(graphicsHeight), float32(graphicsWidth))
-	backgroundbox.Add(vBox)
-	backgroundbox.Add(Car)
-	backgroundbox.Resize(fyne.NewSize(windowDims.Width, windowDims.Height))
-
-	content := container.NewVBox(
-		backgroundbox,
-	)
-	
-	elevatorWindow.SetContent(content)
-	elevatorWindow.Resize(fyne.NewSize(windowDims.Width, windowDims.Height))
-
-	elevatorApp.Lifecycle().SetOnStarted(func() {
-		log.Println("The app has started.")
-	})
-	
-	return elevatorApp, elevatorWindow
-	*/
-	return nil, nil
-}
 
 
