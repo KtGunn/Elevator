@@ -24,11 +24,14 @@ func NewApplication() Application {
 }
 
 
+var Cabins []ElevatorCabin
+
 func CreateAppInstance(windowDims fyne.Size, levels []*Level) {
 
   ApplicationInstance = NewApp(windowDims)
 
 	cabin := CreateElevatorCabin(windowDims, levels)
+	Cabins = append(Cabins, cabin)
 	
 	cab := container.NewWithoutLayout(cabin.background)
 	cab.Add(cabin.car.container)
