@@ -101,6 +101,10 @@ func SetCarPositions(levels []*Level, floorDims FloorDimensions) []CarPosition {
 
 
 
+// CabinToLevels
+//  Translates Landings from input json file into the Level structure
+//  used to draw the elevator cabin.
+//
 func CabinToLevels(landings []*Landing) []*Level {
 
 	var levels []*Level

@@ -63,10 +63,13 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 			CabinObjects = append(CabinObjects, cabinObj)
 		}
 	}
-
+	
+	windowSize := fyne.NewSize(
+		windowDims.Width*float32(len(CabinObjects)),
+		windowDims.Height)
 
 	ApplicationInstance.win.SetContent(content)
-	ApplicationInstance.win.Resize(fyne.NewSize(windowDims.Width*2, windowDims.Height))
+	ApplicationInstance.win.Resize(windowSize)
 	ApplicationInstance.win.ShowAndRun()
 }
 
