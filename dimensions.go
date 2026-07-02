@@ -1,10 +1,19 @@
 package main
 
 import (
-	//"log"
+	"log"
 )
 
+const (
+	WIDTH_CAR int = 10
+	WIDTH_LOBBY int = 12
+	WIDTH_HALL  int = 18
 
+	HEIGHT_BOX_MAX int = 50
+	WIDTH_BOX_MAX  int = 50
+
+	VERTICAL_PIXEL_MARGIN int = 2
+)
 
 func SetDimensions(boxHeight int, boxWidth int, floors int) FloorDimensions {
 
@@ -23,45 +32,44 @@ func SetDimensions(boxHeight int, boxWidth int, floors int) FloorDimensions {
 
 
 
-var verticalPixelMargin int = 2
 
 func FloorAndCabHeights(overallHeight int, overallWidth int, floors int) (int, int, int) {
 
 	var floorHeight int
 	var boxHeight int
 	
-	verticalMargin := 2 * verticalPixelMargin
+	verticalMargin := 2 * VERTICAL_PIXEL_MARGIN
 	
 	floorHeight = (overallHeight-verticalMargin) / floors
 
-	if floorHeight > 50 {
-		boxHeight = 50
+	if floorHeight > HEIGHT_BOX_MAX {
+		boxHeight = HEIGHT_BOX_MAX
 	} else {
 		boxHeight = floorHeight - 2
 	}
 
-	return floorHeight, boxHeight, verticalPixelMargin
+	return floorHeight, boxHeight, VERTICAL_PIXEL_MARGIN
 }
 
 
 func AllocateDimensions(overallHeight int, overallWidth int) (int, int, int) {
-
+	log.Println(overallWidth)
 	var boxWidth int
 	var cabinWidth float32
-
-	units := 2*(10+10)+6
+	
+	units := 2*(WIDTH_HALL + WIDTH_LOBBY) + WIDTH_CAR
 	unitWidth := float32(overallWidth)/float32(units)
 	
-	if false {
-		if cabinWidth > 50 {
-			boxWidth = 50
-		} else {
-			boxWidth = int(cabinWidth)
-		}
-		units = (overallWidth - boxWidth) /(2*(10+10))
-	}
+	cabinWidth = float32(WIDTH_CAR) * unitWidth
 	
-	return int(6*unitWidth), int(10*unitWidth), int(10*unitWidth)
+	if int(cabinWidth) > WIDTH_BOX_MAX {
+		boxWidth = WIDTH_BOX_MAX
+	} else {
+		boxWidth = int(cabinWidth)
+	}
+
+	floatUnits := float32((overallWidth - boxWidth)) / float32((2*(WIDTH_HALL + WIDTH_LOBBY)))
+	return boxWidth, int(floatUnits*float32(WIDTH_LOBBY)), int(floatUnits*float32(WIDTH_HALL))
 }
 
 
@@ -78,7 +86,7 @@ func SetCarPositions(levels []*Level, floorDims FloorDimensions) []CarPosition {
 	carPositions := []CarPosition{}
 	xCoord := floorDims.hallLength + floorDims.lobbyLength
 	
-	for _, level := range Levels {
+	for _, level := range levels {
 		number := int(level.Number)
 		yCoord := number*floorDims.floorHeight + floorDims.bottomLevel
 		carPositions = append(carPositions, CarPosition{
@@ -89,4 +97,26 @@ func SetCarPositions(levels []*Level, floorDims FloorDimensions) []CarPosition {
 	}
 
 	return carPositions
+}
+
+
+
+// CabinToLevels
+//  Translates Landings from input json file into the Level structure
+//  used to draw the elevator cabin.
+//
+func CabinToLevels(landings []*Landing) []*Level {
+
+	var levels []*Level
+
+	for _, landing := range landings {
+		level := &Level{
+			Number: int32(landing.Floor),
+			Front: landing.Door == 0 || landing.Door == 2,
+			Rear:  landing.Door == 2 || landing.Door == 1,
+		}
+		levels = append(levels, level)
+	}
+
+	return levels
 }

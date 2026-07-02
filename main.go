@@ -9,7 +9,7 @@ import (
 func main() {
 	var err error
 
-	err = ReadLevels("levels.json")
+	err = ReadBanks("elevators.json")
 	if err != nil {
 		log.Fatal("could not read json file: ", err)
 	}
@@ -19,8 +19,7 @@ func main() {
 		Height: 280,
 	}
 
-	CreateAppInstance(windowSize, Levels)
-	CreateElevatorCabin(windowSize, Levels)
+	CreateAppInstance(windowSize, Banks)
 
 	return
 }

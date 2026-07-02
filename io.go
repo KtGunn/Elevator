@@ -6,10 +6,10 @@ import (
 	"encoding/json"
 )
 
-var Levels []*Level
+var Banks []*Bank
 
 
-func ReadLevels(fname string)  error {
+func ReadBanks(fname string)  error {
 
 	file, err := os.Open(fname)
 	if err != nil {
@@ -17,13 +17,25 @@ func ReadLevels(fname string)  error {
 	}
 	defer file.Close()
 
-	var levels []*Level
+	var banks []*Bank
+
 	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&levels); err != nil {
+	if err := decoder.Decode(&banks); err != nil {
 		return err
 	}
 
-	Levels = levels
+	log.Println("  banks --- ")
+	for _, b := range banks {
+		log.Println("bank name", b.Name)
+		for _, c := range b.Cars {
+			log.Println("  cab name", c.Name)
+			for _, l := range c.Landings {
+				log.Println("    landing:", l.Floor, l.Door, l.Label)
+			}
+		}
+	}
+
+	Banks = banks
 	
 	return nil
 }
