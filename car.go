@@ -93,7 +93,6 @@ func (c Car) SetToFloor(floor int, positions []CarPosition) (float32, float32){
 
 
 func CabinCar(floorDims FloorDimensions) Car {
-	log.Println("Creating a new car")
 
 	car := NewCar()
 	car.objects, car.container = CreateCarObjects(floorDims)

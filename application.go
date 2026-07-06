@@ -57,7 +57,7 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 
 			cab := container.NewWithoutLayout(cabinObj.elevator.background)
 			cab.Add(cabinObj.elevator.car.container)
-			cabinObj.elevator.Place(0, windowDims.Height)
+			cabinObj.elevator.Place(0)
 			content.Add(cab)
 
 			CabinObjects = append(CabinObjects, cabinObj)
@@ -88,6 +88,9 @@ func NewApp(windowDims fyne.Size) Application {
 
 	newApp.win.SetPadded(false)
 	newApp.win.SetFixedSize(true)
+
+	// This is a kludge!
+	yOffset = int(windowDims.Height)
 
 	return newApp
 }
