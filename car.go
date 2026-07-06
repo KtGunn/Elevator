@@ -28,26 +28,26 @@ type Car struct {
 	carHeight int
 }
 
-func NewCar() Car {
-	return Car{
+func NewCar() *Car {
+	return &Car{
 		frontState: DOOR_CLOSED,
 		rearState: DOOR_CLOSED,
 	}
 }
 
-func (c Car) OpenDoor(which int) {
+func (c *Car) OpenDoor(which int) {
 	switch which {
 
 	case FRONT_DOOR:
 		if c.frontState == DOOR_OPEN {
-			log.Fatal("Cabin door is open when expected to be closed")
+			log.Fatal("A Cabin door is open when expected to be closed")
 		}
 		c.objects.front.Hide()
 		c.frontState = DOOR_OPEN
 
 	case REAR_DOOR:
 		if c.rearState == DOOR_OPEN {
-			log.Fatal("Cabin door is open when expected to be closed")
+			log.Fatal("B Cabin door is open when expected to be closed")
 		}
 		c.objects.rear.Hide()
 		c.rearState = DOOR_OPEN
@@ -58,21 +58,21 @@ func (c Car) OpenDoor(which int) {
 	
 }
 
-func (c Car) CloseDoor(which int) {
+func (c *Car) CloseDoor(which int) {
 	switch which {
 
 	case FRONT_DOOR:
 		if c.frontState == DOOR_CLOSED {
-			log.Fatal("Cabin door is closed when expected to be open")
+			log.Fatal("C Cabin door is closed when expected to be open")
 		}
-		c.objects.front.Hide()
+		c.objects.front.Show()
 		c.frontState = DOOR_CLOSED
 
 	case REAR_DOOR:
 		if c.rearState == DOOR_CLOSED {
-			log.Fatal("Cabin door is closed when expected to be open")
+			log.Fatal("D Cabin door is closed when expected to be open")
 		}
-		c.objects.rear.Hide()
+		c.objects.rear.Show()
 		c.rearState = DOOR_CLOSED
 
 	default:
@@ -80,7 +80,7 @@ func (c Car) CloseDoor(which int) {
 	}
 }
 
-func (c Car) SetToFloor(floor int, positions []CarPosition) (float32, float32){
+func (c *Car) SetToFloor(floor int, positions []CarPosition) (float32, float32){
 
 	for _, carPos := range positions {
 		if carPos.level == floor {
@@ -92,8 +92,7 @@ func (c Car) SetToFloor(floor int, positions []CarPosition) (float32, float32){
 
 
 
-func CabinCar(floorDims FloorDimensions) Car {
-	log.Println("Creating a new car")
+func CabinCar(floorDims FloorDimensions) *Car {
 
 	car := NewCar()
 	car.objects, car.container = CreateCarObjects(floorDims)

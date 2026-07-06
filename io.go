@@ -24,7 +24,16 @@ func ReadBanks(fname string)  error {
 		return err
 	}
 
-	log.Println("  banks --- ")
+	ShowBanks(banks)
+
+	Banks = banks
+	
+	return nil
+}
+
+func ShowBanks(banks []*Bank) {
+	log.Println("Banks...")
+
 	for _, b := range banks {
 		log.Println("bank name", b.Name)
 		for _, c := range b.Cars {
@@ -34,15 +43,5 @@ func ReadBanks(fname string)  error {
 			}
 		}
 	}
-
-	Banks = banks
-	
-	return nil
 }
 
-func ShowLevels(levels []*Level) {
-	log.Println("Number of floors", len(levels))
-	for _, level := range levels {
-		log.Println("lev", level)
-	}
-}

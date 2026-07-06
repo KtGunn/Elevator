@@ -22,7 +22,7 @@ var (
 // ElevatorCabin
 //
 type ElevatorCabin struct {
-	car Car
+	car *Car
 	background *fyne.Container
 	dimensions ElevatorDimensions
 }
@@ -31,14 +31,15 @@ func NewElevatorCabin() ElevatorCabin {
 	return ElevatorCabin{}
 }
 
-func (e ElevatorCabin) Place(floor int, yOffset float32 ) {
+func (e ElevatorCabin) Place(floor int) {
 
+	log.Println("@Place: (global)", yOffset)
 	xPix, yPix := e.car.SetToFloor(floor, e.dimensions.positions)
 	if xPix < 0 && yPix < 0 {
 		return
 	}
 	
-	e.car.container.Move(fyne.NewPos(xPix, yOffset - yPix))
+	e.car.container.Move(fyne.NewPos(xPix, float32(yOffset) - yPix))
 }
 
 
