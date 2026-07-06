@@ -22,7 +22,7 @@ var (
 // ElevatorCabin
 //
 type ElevatorCabin struct {
-	car Car
+	car *Car
 	background *fyne.Container
 	dimensions ElevatorDimensions
 }
