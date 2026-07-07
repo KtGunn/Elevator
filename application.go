@@ -25,6 +25,8 @@ func NewApplication() Application {
 
 var CabinObjects []CabinObject
 
+var Robots []*Robot
+
 type CabinObject struct {
 	elevator ElevatorCabin
 	bank string
@@ -64,6 +66,10 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 		}
 	}
 
+	robot := CreateRobot("Tug", CabinObjects[0].elevator.dimensions.car)
+	Robots = append(Robots, robot)
+	robot.AssignCar(CabinObjects[0].elevator.car)
+
 	windowSize := fyne.NewSize(
 		windowDims.Width*float32(len(CabinObjects)),
 		windowDims.Height)
@@ -96,6 +102,15 @@ func NewApp(windowDims fyne.Size) Application {
 }
 
 
+
+func CarFromName(name string) *Car {
+	for _, co := range CabinObjects {
+		if name == co.cabin {
+			return co.elevator.car
+		}
+	}
+	return nil
+}
 
 // GetCabinObject
 //  returns the CabinObject

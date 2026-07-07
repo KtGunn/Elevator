@@ -16,6 +16,10 @@ const (
 )
 
 
+func NewRobotDimensions() RobotDimensions {
+	return RobotDimensions{}
+}
+
 type RobotObjects struct {
 	body   fyne.CanvasObject
 	wheel  fyne.CanvasObject
@@ -26,11 +30,11 @@ func NewRobotObjects() *RobotObjects {
 	}
 }
 
-func CreateRobotObjects(floorDims FloorDimensions) (*RobotObjects, *fyne.Container) {
+func CreateRobotObjects(cardims CarDimensions) (*RobotObjects, *fyne.Container, RobotDimensions) {
 
-	wheelPixels  := ROBOT_WHEEL * float32(floorDims.boxHeight)
-	heightPixels := ROBOT_HEIGHT * float32(floorDims.boxHeight)
-	widthPixels  := ROBOT_WIDTH * float32(floorDims.carLength)
+	wheelPixels  := ROBOT_WHEEL * float32(cardims.boxHeight)
+	heightPixels := ROBOT_HEIGHT * float32(cardims.boxHeight)
+	widthPixels  := ROBOT_WIDTH * float32(cardims.carLength)
 	
 	wheel := canvas.NewCircle(color.RGBA{R: 10, G: 10, B: 10, A: 255})
 	wheel.Resize(fyne.NewSize(float32(wheelPixels), float32(wheelPixels)))
@@ -47,5 +51,11 @@ func CreateRobotObjects(floorDims FloorDimensions) (*RobotObjects, *fyne.Contain
 	objs.body = body
 	objs.wheel = wheel
 
-	return objs, robot
+	dims := RobotDimensions{
+		bodyHeight: int(heightPixels),
+		bodyWidth: int(widthPixels),
+		wheelDia: int(wheelPixels),
+	}
+
+	return objs, robot, dims
 }

@@ -38,10 +38,19 @@ func (e ElevatorCabin) Place(floor int) {
 	if xPix < 0 && yPix < 0 {
 		return
 	}
-	
+
 	e.car.container.Move(fyne.NewPos(xPix, float32(yOffset) - yPix))
 }
 
+
+// PositionCoordinates
+//  return the xy pixel coordinates of the floor area requested.
+//  say 'lobby, rear' is requested, two pairs of xy-coordinates for
+//  the start and end of the area are returned.
+//
+func (e ElevatorCabin) PositionCoordinates(floor int, floorposition string, door int) {
+
+}
 
 
 //////////////////////////////////////////////////////////////
@@ -63,8 +72,8 @@ func CreateElevatorCabin(dims fyne.Size, levels []*Level) ElevatorCabin {
 	newCabin := NewElevatorCabin()
 	newCabin.dimensions = ElevatorDims(dims,levels)
 
-	newCabin.background = Background(dims, newCabin.dimensions.floor, levels)
-	newCabin.car = CabinCar(newCabin.dimensions.floor)
+	newCabin.background = Background(dims, newCabin.dimensions, levels)
+	newCabin.car = CabinCar(newCabin.dimensions)
 
 	return newCabin
 }
@@ -73,8 +82,8 @@ func CreateElevatorCabin(dims fyne.Size, levels []*Level) ElevatorCabin {
 //
 func ElevatorDims(winDims fyne.Size, floors []*Level) ElevatorDimensions {
 
-	dims := NewDims()
-	dims.floor = SetDimensions(int(winDims.Height), int(winDims.Width), len(floors))
+	dims := ElevatorDimensions{}
+	dims.floor, dims.car = SetDimensions(int(winDims.Height), int(winDims.Width), len(floors))
 	dims.positions = SetCarPositions(floors, dims.floor)
 
 	return dims
@@ -83,24 +92,24 @@ func ElevatorDims(winDims fyne.Size, floors []*Level) ElevatorDimensions {
 
 // Background
 //
-func Background(dims fyne.Size, floorDims FloorDimensions, levels []*Level) *fyne.Container {
+func Background(win fyne.Size, dims ElevatorDimensions, levels []*Level) *fyne.Container {
 
 	cont := container.NewWithoutLayout()
 
 	// Background rectangle
 	//
 	backgroundbox := canvas.NewRectangle(DARK)
-	backgroundbox.Resize(dims)
-	backgroundbox.SetMinSize(dims)
+	backgroundbox.Resize(win)
+	backgroundbox.SetMinSize(win)
 	cont.Add(backgroundbox)
-	
+
 
 	// Floors
 	//
 	for index, level := range levels {
 
-		height := index*floorDims.floorHeight + floorDims.bottomLevel
-		flObj := CreateFloorObject(int(dims.Height), height, floorDims, level.Front, level.Rear)
+		height := index*dims.floor.floorHeight + dims.floor.bottomLevel
+		flObj := CreateFloorObject(int(win.Height), height, dims, level.Front, level.Rear)
 
 		for _, obj := range flObj {
 			cont.Add(obj)
@@ -111,35 +120,35 @@ func Background(dims fyne.Size, floorDims FloorDimensions, levels []*Level) *fyn
 }
 
 
-func CreateFloorObject(yOff int, yLevel int, floorDims FloorDimensions, front bool, rear bool) []fyne.CanvasObject {
+func CreateFloorObject(yOff int, yLevel int, dims ElevatorDimensions, front bool, rear bool) []fyne.CanvasObject {
 
 	objs := []fyne.CanvasObject{}
 	position := fyne.Position{X: 0, Y: float32(yLevel)}
 
 	if front {
 
-		line, pos := CreateALine(BLACK, yOff, position, 2, floorDims.hallLength)
+		line, pos := CreateALine(BLACK, yOff, position, 2, dims.floor.hallLength)
 		objs = append(objs, line)
 		position = pos
 
-		line, pos = CreateALine(RED, yOff, position, 4, floorDims.lobbyLength)
+		line, pos = CreateALine(RED, yOff, position, 4, dims.floor.lobbyLength)
 		objs = append(objs, line)
 		position = pos
 
 	} else {
-		position.X = position.X + float32(floorDims.hallLength+floorDims.lobbyLength)
+		position.X = position.X + float32(dims.floor.hallLength+dims.floor.lobbyLength)
 	}
 
-	line, pos := CreateALine(GREY, yOff, position, 2, floorDims.carLength)
+	line, pos := CreateALine(GREY, yOff, position, 2, dims.car.carLength)
 	objs = append(objs, line)
 	position = pos
 
 	if rear {
-		line, pos := CreateALine(RED, yOff, position, 4, floorDims.lobbyLength)
+		line, pos := CreateALine(RED, yOff, position, 4, dims.floor.lobbyLength)
 		objs = append(objs, line)
 		position = pos
 
-		line, pos = CreateALine(BLACK, yOff, position, 2, floorDims.hallLength)
+		line, pos = CreateALine(BLACK, yOff, position, 2, dims.floor.hallLength)
 		objs = append(objs, line)
 		position = pos
 	}
