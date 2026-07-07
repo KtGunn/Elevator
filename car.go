@@ -92,11 +92,11 @@ func (c *Car) SetToFloor(floor int, positions []CarPosition) (float32, float32){
 
 
 
-func CabinCar(floorDims FloorDimensions) *Car {
+func CabinCar(dims ElevatorDimensions) *Car {
 
 	car := NewCar()
-	car.objects, car.container = CreateCarObjects(floorDims)
-	car.carHeight = floorDims.boxHeight
+	car.objects, car.container = CreateCarObjects(dims.car)
+	car.carHeight = dims.car.boxHeight
 	car.yOffset = yOffset
 
 	return car

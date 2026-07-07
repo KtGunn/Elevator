@@ -4,8 +4,18 @@ import (
 	"log"
 )
 
+
+/////////////////////////////////////////////////////////////////////
+// RELATIVE FLOOR DIMENSIONS, not actual pixel dimensions.
+//
+//                       |
+//    (hallway)    (lobby) | (cabin)  C (center
+//   ............|_________|_________ L  line)
+//
+//   size ratios: hallway(10) lobby(10) cabin(6)
+//
 const (
-	WIDTH_CAR int = 10
+	WIDTH_CAR   int = 10
 	WIDTH_LOBBY int = 12
 	WIDTH_HALL  int = 18
 
@@ -15,19 +25,67 @@ const (
 	VERTICAL_PIXEL_MARGIN int = 2
 )
 
-func SetDimensions(boxHeight int, boxWidth int, floors int) FloorDimensions {
+
+
+
+/////////////////////////////////////////////////////////////////////
+// ACTUAL FLOOR DIMENSIONS in pixels.
+//
+type RobotDimensions struct {
+	bodyHeight int
+	bodyWidth  int
+	wheelDia   int
+}
+
+type FloorDimensions struct {
+	hallLength   int
+	lobbyLength  int
+	floors       int
+	floorHeight  int
+	bottomLevel int
+}
+
+// Cabin & Doors
+//
+//    ______________
+//    |_         __|
+//    | |        | |
+//    | |        | |
+//    | |        | |
+//    |_|________|_|
+//
+type CarDimensions struct {
+	carLength int
+	boxHeight int
+}
+
+
+
+//
+type ElevatorDimensions struct {
+	floor     FloorDimensions
+	car       CarDimensions
+	positions   []CarPosition
+}
+
+
+
+
+func SetDimensions(winHeight int, winWidth int, floors int) (FloorDimensions, CarDimensions) {
 
 	var floorDims FloorDimensions = FloorDimensions{
 		floors: floors,
 	}
 
-	floorDims.floorHeight, floorDims.boxHeight, floorDims.bottomLevel =
-		FloorAndCabHeights(boxHeight, boxWidth, floorDims.floors)
+	var carDims CarDimensions = CarDimensions{}
+	
+	floorDims.floorHeight, carDims.boxHeight, floorDims.bottomLevel =
+		FloorAndCabHeights(winHeight, winWidth, floorDims.floors)
 
-	floorDims.carLength, floorDims.lobbyLength, floorDims.hallLength =
-		AllocateDimensions(int(boxHeight), int(boxWidth))
+	carDims.carLength, floorDims.lobbyLength, floorDims.hallLength =
+		AllocateDimensions(int(winHeight), int(winWidth))
 
-	return floorDims
+	return floorDims, carDims
 }
 
 
