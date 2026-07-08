@@ -15,17 +15,26 @@ import (
 //   size ratios: hallway(10) lobby(10) cabin(6)
 //
 const (
-	WIDTH_CAR   int = 10
-	WIDTH_LOBBY int = 12
-	WIDTH_HALL  int = 18
+	REl_WIDTH_CAR   int = 10
+	REl_WIDTH_LOBBY int = 12
+	REl_WIDTH_HALL  int = 18
 
-	HEIGHT_BOX_MAX int = 50
-	WIDTH_BOX_MAX  int = 50
+	REl_HEIGHT_BOX_MAX int = 50
+	REl_WIDTH_BOX_MAX  int = 50
 
 	VERTICAL_PIXEL_MARGIN int = 2
 )
 
 
+// Cabin & Doors
+//
+//    ______________
+//    |_         __|
+//    | |        | |
+//    | |        | |
+//    | |        | |
+//    |_|________|_|
+//
 
 
 /////////////////////////////////////////////////////////////////////
@@ -40,24 +49,18 @@ type RobotDimensions struct {
 type FloorDimensions struct {
 	hallLength   int
 	lobbyLength  int
-	floors       int
-	floorHeight  int
-	bottomLevel int
+	shaftLength  int
+	floorHeight int
 }
 
-// Cabin & Doors
-//
-//    ______________
-//    |_         __|
-//    | |        | |
-//    | |        | |
-//    | |        | |
-//    |_|________|_|
-//
 type CarDimensions struct {
 	carLength int
-	boxHeight int
+	carHeight int
 }
+
+
+}
+
 
 
 
@@ -68,6 +71,12 @@ type ElevatorDimensions struct {
 	positions   []CarPosition
 }
 
+
+
+
+func FloorHeights(overallHeight int, bottomHeight int, verticalMargin int, floors int) (levelHeight []int) {
+	floorSpan := float32(overallHeight - bottomHeight - verticalMargin) / float32(floors)
+}
 
 
 
@@ -115,10 +124,10 @@ func AllocateDimensions(overallHeight int, overallWidth int) (int, int, int) {
 	var boxWidth int
 	var cabinWidth float32
 	
-	units := 2*(WIDTH_HALL + WIDTH_LOBBY) + WIDTH_CAR
+	units := 2*(REL_WIDTH_HALL + WIDTH_LOBBY) + REL_WIDTH_CAR
 	unitWidth := float32(overallWidth)/float32(units)
 	
-	cabinWidth = float32(WIDTH_CAR) * unitWidth
+	cabinWidth = float32(REL_WIDTH_CAR) * unitWidth
 	
 	if int(cabinWidth) > WIDTH_BOX_MAX {
 		boxWidth = WIDTH_BOX_MAX
@@ -126,8 +135,8 @@ func AllocateDimensions(overallHeight int, overallWidth int) (int, int, int) {
 		boxWidth = int(cabinWidth)
 	}
 
-	floatUnits := float32((overallWidth - boxWidth)) / float32((2*(WIDTH_HALL + WIDTH_LOBBY)))
-	return boxWidth, int(floatUnits*float32(WIDTH_LOBBY)), int(floatUnits*float32(WIDTH_HALL))
+	floatUnits := float32((overallWidth - boxWidth)) / float32((2*(REL_WIDTH_HALL + WIDTH_LOBBY)))
+	return boxWidth, int(floatUnits*float32(WIDTH_LOBBY)), int(floatUnits*float32(REL_WIDTH_HALL))
 }
 
 
