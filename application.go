@@ -59,42 +59,39 @@ func NewElevator(bank string, car string, landings []*Landing,
 	return cabinObj
 }
 
-
-func AnotherRobot(name string,dims CarDimensions) *Robot {
-		return CreateRobot(name, dims)
+func AddRobots() {
+	
+	for n, cabinObj := range CabinObjects {
+		
+		robot := CreateRobot(fmt.Sprintf("Tug-%d", n), cabinObj.elevator.dimensions.car)
+		Robots = append(Robots, robot)
+		
+		robot.AssignCar(cabinObj.elevator.car)
+		robot.SetFloorState(PCOL_LOBBY)
+		
+		cabinObj.image.Add(robot.image)
+		robot.Place(0, cabinObj.elevator.dimensions)
+	}
 }
 
 
+
 func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
-
+	
   ApplicationInstance = NewApp(windowDims)
-
+	
 	content := container.NewHBox()
-
+	
 	for _, bank := range banks {
 		for _, car := range bank.Cars {
-
+			
 			cabinObj := NewElevator(bank.Name, car.Name, car.Landings, windowDims)
 			CabinObjects = append(CabinObjects, cabinObj)
 			content.Add(cabinObj.image)
-
-			}
+		}
 	}
-
-
-	for n, cabinObj := range CabinObjects {
-		
-		robot := AnotherRobot(fmt.Sprintf("Tug-%d", n), cabinObj.elevator.dimensions.car)
-		Robots = append(Robots, robot)
-
-		robot.AssignCar(cabinObj.elevator.car)
-		robot.SetFloorState(PCOL_LOBBY)
-
-		cabinObj.image.Add(robot.image)
-		robot.Place(0, cabinObj.elevator.dimensions)
-		
-	}
-
+	
+	AddRobots()
 
 	windowSize := fyne.NewSize(
 		windowDims.Width*float32(len(CabinObjects)),
