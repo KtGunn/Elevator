@@ -60,15 +60,22 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 			cab := container.NewWithoutLayout(cabinObj.elevator.background)
 			cab.Add(cabinObj.elevator.car.container)
 			cabinObj.elevator.Place(0)
+
+			if len(CabinObjects) == 0 {
+				robot := CreateRobot("Tug", cabinObj.elevator.dimensions.car)
+				Robots = append(Robots, robot)
+				robot.AssignCar(cabinObj.elevator.car)
+				robot.SetFloorState(PCOL_LOBBY)
+				cab.Add(robot.image)
+				robot.Place(0, cabinObj.elevator.dimensions)
+			}
+
 			content.Add(cab)
 
 			CabinObjects = append(CabinObjects, cabinObj)
 		}
 	}
 
-	robot := CreateRobot("Tug", CabinObjects[0].elevator.dimensions.car)
-	Robots = append(Robots, robot)
-	robot.AssignCar(CabinObjects[0].elevator.car)
 
 	windowSize := fyne.NewSize(
 		windowDims.Width*float32(len(CabinObjects)),
