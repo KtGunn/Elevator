@@ -28,29 +28,14 @@ var Robots []*Robot
 
 
 
-
-/*
-   func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
-
-  ApplicationInstance = NewApp(windowDims)
-	content := container.NewHBox()
-
-	for _, bank := range banks {
-		for _, car := range bank.Cars {
-			NewElevator(bank.Name, car.Name)
-		}
-	}
-}
-*/
-
 func NewElevator(bank string, car string, landings []*Landing,
 	dims fyne.Size) CabinObject {
 
 	cabinObj := NewCabinObject(bank, car)
 	levels := CabinToLevels(landings)
-	
+
 	cabinObj.elevator = CreateElevatorCabin(dims, levels)
-	
+
 	image := container.NewWithoutLayout(cabinObj.elevator.background)
 	image.Add(cabinObj.elevator.car.container)
 	cabinObj.elevator.Place(0)
@@ -60,15 +45,15 @@ func NewElevator(bank string, car string, landings []*Landing,
 }
 
 func AddRobots() {
-	
+
 	for n, cabinObj := range CabinObjects {
-		
+
 		robot := CreateRobot(fmt.Sprintf("Tug-%d", n), cabinObj.elevator.dimensions.car)
 		Robots = append(Robots, robot)
-		
+
 		robot.AssignCar(cabinObj.elevator.car)
 		robot.SetFloorState(PCOL_LOBBY)
-		
+
 		cabinObj.image.Add(robot.image)
 		robot.Place(0, cabinObj.elevator.dimensions)
 	}
@@ -77,20 +62,20 @@ func AddRobots() {
 
 
 func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
-	
+
   ApplicationInstance = NewApp(windowDims)
-	
+
 	content := container.NewHBox()
-	
+
 	for _, bank := range banks {
 		for _, car := range bank.Cars {
-			
+
 			cabinObj := NewElevator(bank.Name, car.Name, car.Landings, windowDims)
 			CabinObjects = append(CabinObjects, cabinObj)
 			content.Add(cabinObj.image)
 		}
 	}
-	
+
 	AddRobots()
 
 	windowSize := fyne.NewSize(
@@ -125,3 +110,20 @@ func NewApp(windowDims fyne.Size) Application {
 	return newApp
 }
 
+func RobotFromName(name string) *Robot {
+	for _, r := range Robots {
+		if name == r.name {
+			return r
+		}
+	}
+	return nil
+}
+
+func CabinObjFromCar(car *Car) CabinObject {
+	for _, cobj := range CabinObjects {
+		if cobj.elevator.car == car {
+			return cobj
+		}
+	}
+	return CabinObject{}
+}

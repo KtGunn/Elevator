@@ -23,6 +23,7 @@ type Car struct {
 
 	frontState int
 	rearState  int
+	floor int
 
 	yOffset int
 	carHeight int
@@ -84,6 +85,7 @@ func (c *Car) SetToFloor(floor int, positions []CarPosition) (float32, float32){
 
 	for _, carPos := range positions {
 		if carPos.level == floor {
+			c.floor = floor // [ktg] set the floor
 			return float32(carPos.xPixCoord), float32(carPos.yPixCoord + c.carHeight)
 		}
 	}
