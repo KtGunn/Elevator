@@ -39,13 +39,14 @@ func CreateRobotObjects(cardims CarDimensions) (*RobotObjects, *fyne.Container, 
 	wheel := canvas.NewCircle(color.RGBA{R: 10, G: 10, B: 10, A: 255})
 	wheel.Resize(fyne.NewSize(float32(wheelPixels), float32(wheelPixels)))
 
-	body := canvas.NewRectangle(color.RGBA{R: 210, G: 210, B: 210, A: 255})
+	body := canvas.NewRectangle(color.RGBA{R: 10, G: 110, B: 210, A: 255})
 	body.Resize(fyne.NewSize(float32(widthPixels), float32(heightPixels)))
 
 	robot := container.NewWithoutLayout()
 	robot.Add(body)
 	robot.Add(wheel)
-	wheel.Move(fyne.NewPos(0.5*float32(wheelPixels), -0.5*float32(wheelPixels)))
+	wheel.Move(fyne.NewPos(0.5*float32(widthPixels-wheelPixels), float32(heightPixels)))
+	//wheel.Move(fyne.NewPos(0.5*float32(widthPixels-wheelPixels), -0.5*float32(wheelPixels)))
 
 	objs := NewRobotObjects()
 	objs.body = body
