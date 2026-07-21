@@ -2,7 +2,7 @@ package main
 
 import (
 	//"log"
-	"fmt"
+	//"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -24,22 +24,7 @@ func NewApplication() Application {
 
 
 var CabinObjects []CabinObject
-
 var Robots []*Robot
-
-type CabinObject struct {
-	elevator ElevatorCabin
-	bank string
-	cabin string
-}
-func NewCabinObject (bank string, cabin string) CabinObject {
-	return CabinObject{
-		bank: bank,
-		cabin: cabin,
-	}
-}
-
-
 
 
 
@@ -107,33 +92,4 @@ func NewApp(windowDims fyne.Size) Application {
 
 	return newApp
 }
-
-
-
-func CarFromName(name string) *Car {
-	for _, co := range CabinObjects {
-		if name == co.cabin {
-			return co.elevator.car
-		}
-	}
-	return nil
-}
-
-// GetCabinObject
-//  returns the CabinObject
-func GetCabinObject(bank string, car string) (CabinObject, error) {
-
-	for _, co := range CabinObjects {
-		if bank == co.bank {
-			return co, nil
-		}
-		if car == co.cabin {
-			return co, nil
-		}
-	}
-
-	return CabinObject{}, fmt.Errorf("cabin object not found")
-}
-
-
 
