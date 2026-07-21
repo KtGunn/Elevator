@@ -2,7 +2,7 @@ package main
 
 import (
 	//"log"
-	//"fmt"
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -44,18 +44,19 @@ var Robots []*Robot
 */
 
 func NewElevator(bank string, car string, landings []*Landing,
-	dims fyne.Size) (CabinObject, *fyne.Container){
+	dims fyne.Size) CabinObject {
 
 	cabinObj := NewCabinObject(bank, car)
 	levels := CabinToLevels(landings)
 	
 	cabinObj.elevator = CreateElevatorCabin(dims, levels)
 	
-	cab := container.NewWithoutLayout(cabinObj.elevator.background)
-	cab.Add(cabinObj.elevator.car.container)
+	image := container.NewWithoutLayout(cabinObj.elevator.background)
+	image.Add(cabinObj.elevator.car.container)
 	cabinObj.elevator.Place(0)
 
-	return cabinObj, cab
+	cabinObj.image = image
+	return cabinObj
 }
 
 
@@ -73,30 +74,32 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 	for _, bank := range banks {
 		for _, car := range bank.Cars {
 
-			cabinObj, cab := NewElevator(bank.Name, car.Name, car.Landings, windowDims)
-			
-			if len(CabinObjects) == 0 {
-				robot := AnotherRobot("Tug", cabinObj.elevator.dimensions.car)
-				/*
-				  robot := CreateRobot("Tug", cabinObj.elevator.dimensions.car)
-				*/
-				Robots = append(Robots, robot)
-				robot.AssignCar(cabinObj.elevator.car)
-				robot.SetFloorState(PCOL_LOBBY)
-				cab.Add(robot.image)
-				robot.Place(0, cabinObj.elevator.dimensions)
-			}
-
-			content.Add(cab)
-
+			cabinObj := NewElevator(bank.Name, car.Name, car.Landings, windowDims)
 			CabinObjects = append(CabinObjects, cabinObj)
-		}
+			content.Add(cabinObj.image)
+
+			}
+	}
+
+
+	for n, cabinObj := range CabinObjects {
+		
+		robot := AnotherRobot(fmt.Sprintf("Tug-%d", n), cabinObj.elevator.dimensions.car)
+		Robots = append(Robots, robot)
+
+		robot.AssignCar(cabinObj.elevator.car)
+		robot.SetFloorState(PCOL_LOBBY)
+
+		cabinObj.image.Add(robot.image)
+		robot.Place(0, cabinObj.elevator.dimensions)
+		
 	}
 
 
 	windowSize := fyne.NewSize(
 		windowDims.Width*float32(len(CabinObjects)),
-		windowDims.Height)
+		windowDims.Height,
+	)
 
 	ApplicationInstance.win.SetContent(content)
 	ApplicationInstance.win.Resize(windowSize)
