@@ -15,8 +15,8 @@ func main() {
 	}
 	
 	windowSize :=fyne.Size{
-		Width: 240,
-		Height: 280,
+		Width: 260,
+		Height: 350,
 	}
 
 	CreateAppInstance(windowSize, Banks)

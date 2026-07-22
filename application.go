@@ -24,22 +24,40 @@ func NewApplication() Application {
 
 
 var CabinObjects []CabinObject
-
 var Robots []*Robot
 
-type CabinObject struct {
-	elevator ElevatorCabin
-	bank string
-	cabin string
+
+
+func NewElevator(bank string, car string, landings []*Landing,
+	dims fyne.Size) CabinObject {
+
+	cabinObj := NewCabinObject(bank, car)
+	levels := CabinToLevels(landings)
+
+	cabinObj.elevator = CreateElevatorCabin(dims, levels)
+
+	image := container.NewWithoutLayout(cabinObj.elevator.background)
+	image.Add(cabinObj.elevator.car.container)
+	cabinObj.elevator.Place(0)
+
+	cabinObj.image = image
+	return cabinObj
 }
-func NewCabinObject (bank string, cabin string) CabinObject {
-	return CabinObject{
-		bank: bank,
-		cabin: cabin,
+
+func AddRobots() {
+
+	for n, cabinObj := range CabinObjects {
+
+		robot := CreateRobot(fmt.Sprintf("Tug-%d", n), cabinObj.elevator.dimensions.car)
+		Robots = append(Robots, robot)
+
+		robot.AssignCar(cabinObj.elevator.car)
+		robot.SetFloorState(PCOL_LOBBY)
+
+		cabinObj.image.Add(robot.image)
+		robot.Place(0, cabinObj.elevator.dimensions)
 	}
 }
-
-
 
 
 
@@ -52,34 +70,18 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 	for _, bank := range banks {
 		for _, car := range bank.Cars {
 
-			cabinObj := NewCabinObject(bank.Name, car.Name)
-			levels := CabinToLevels(car.Landings)
-
-			cabinObj.elevator = CreateElevatorCabin(windowDims, levels)
-
-			cab := container.NewWithoutLayout(cabinObj.elevator.background)
-			cab.Add(cabinObj.elevator.car.container)
-			cabinObj.elevator.Place(0)
-
-			if len(CabinObjects) == 0 {
-				robot := CreateRobot("Tug", cabinObj.elevator.dimensions.car)
-				Robots = append(Robots, robot)
-				robot.AssignCar(cabinObj.elevator.car)
-				robot.SetFloorState(PCOL_LOBBY)
-				cab.Add(robot.image)
-				robot.Place(0, cabinObj.elevator.dimensions)
-			}
-
-			content.Add(cab)
-
+			cabinObj := NewElevator(bank.Name, car.Name, car.Landings, windowDims)
 			CabinObjects = append(CabinObjects, cabinObj)
+			content.Add(cabinObj.image)
 		}
 	}
 
+	AddRobots()
 
 	windowSize := fyne.NewSize(
 		windowDims.Width*float32(len(CabinObjects)),
-		windowDims.Height)
+		windowDims.Height,
+	)
 
 	ApplicationInstance.win.SetContent(content)
 	ApplicationInstance.win.Resize(windowSize)
@@ -108,32 +110,20 @@ func NewApp(windowDims fyne.Size) Application {
 	return newApp
 }
 
-
-
-func CarFromName(name string) *Car {
-	for _, co := range CabinObjects {
-		if name == co.cabin {
-			return co.elevator.car
+func RobotFromName(name string) *Robot {
+	for _, r := range Robots {
+		if name == r.name {
+			return r
 		}
 	}
 	return nil
 }
 
-// GetCabinObject
-//  returns the CabinObject
-func GetCabinObject(bank string, car string) (CabinObject, error) {
-
-	for _, co := range CabinObjects {
-		if bank == co.bank {
-			return co, nil
-		}
-		if car == co.cabin {
-			return co, nil
+func CabinObjFromCar(car *Car) CabinObject {
+	for _, cobj := range CabinObjects {
+		if cobj.elevator.car == car {
+			return cobj
 		}
 	}
-
-	return CabinObject{}, fmt.Errorf("cabin object not found")
+	return CabinObject{}
 }
-
-
-

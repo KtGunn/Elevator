@@ -26,8 +26,8 @@ func CreateCarObjects(cardims CarDimensions) (*CarObjects, *fyne.Container) {
 	var doorWidth float32 = 8
 
 	car := NewCarObjects()
-	grey := color.RGBA{R: 110, G: 110, B: 110, A: 255}
-	car.box = canvas.NewRectangle(grey)
+	purple := color.RGBA{R: 110, G: 110, B: 210, A: 255}
+	car.box = canvas.NewRectangle(purple)
 	car.box.Resize(fyne.NewSize(float32(cardims.carLength), float32(cardims.boxHeight)))
 
 	black := color.RGBA{R: 0, G: 0, B: 0, A: 255}
