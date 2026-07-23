@@ -14,25 +14,19 @@ const (
 )
 
 
-//////////////////////////////////////////////////////////////
-// Car
-//
 type Car struct {
-	container  *fyne.Container
-	objects    *CarObjects
 
-	frontState int
-	rearState  int
-	floor int
+	name string
+	state *CarState
 
-	yOffset int
-	carHeight int
+	image *fyne.Container
+	objects *CarObjects
+	dimensions CarDimensions
 }
 
-func NewCar() *Car {
+func NewCar(name string) *Car {
 	return &Car{
-		frontState: DOOR_CLOSED,
-		rearState: DOOR_CLOSED,
+		name: name,
 	}
 }
 
@@ -40,66 +34,53 @@ func (c *Car) OpenDoor(which int) {
 	switch which {
 
 	case FRONT_DOOR:
-		if c.frontState == DOOR_OPEN {
-			log.Fatal("A Cabin door is open when expected to be closed")
-		}
 		c.objects.front.Hide()
-		c.frontState = DOOR_OPEN
+		c.state.frontOpen = DOOR_OPEN
 
 	case REAR_DOOR:
-		if c.rearState == DOOR_OPEN {
-			log.Fatal("B Cabin door is open when expected to be closed")
-		}
 		c.objects.rear.Hide()
-		c.rearState = DOOR_OPEN
+		c.state.rearOpen = DOOR_OPEN
 
 	default:
 		log.Fatal("OpenDoor", which, "is neither front nor rear")
 	}
-	
 }
 
 func (c *Car) CloseDoor(which int) {
 	switch which {
 
 	case FRONT_DOOR:
-		if c.frontState == DOOR_CLOSED {
-			log.Fatal("C Cabin door is closed when expected to be open")
-		}
 		c.objects.front.Show()
-		c.frontState = DOOR_CLOSED
+		c.state.frontOpen = DOOR_CLOSED
 
 	case REAR_DOOR:
-		if c.rearState == DOOR_CLOSED {
-			log.Fatal("D Cabin door is closed when expected to be open")
-		}
 		c.objects.rear.Show()
-		c.rearState = DOOR_CLOSED
+		c.state.rearOpen = DOOR_CLOSED
 
 	default:
 		log.Fatal("OpenDoor", which, "is neither front nor rear")
 	}
 }
 
-func (c *Car) SetToFloor(floor int, positions []CarPosition) (float32, float32){
 
-	for _, carPos := range positions {
-		if carPos.level == floor {
-			c.floor = floor // [ktg] set the floor
-			return float32(carPos.xPixCoord), float32(carPos.yPixCoord + c.carHeight)
-		}
-	}
+func (c *Car) SetToFloor(floor int, pcol int, side int) (float32, float32){
 	return -1, -1
 }
 
+type CarState struct {
+	floor int
+	available bool
+
+	frontOpen int
+	rearOpen  int
+}
 
 
-func CabinCar(dims ElevatorDimensions) *Car {
+func CreateCar(name string, dims CarDimensions) *Car {
+	
+	car := NewCar(name)
+	car.state = &CarState{}
 
-	car := NewCar()
-	car.objects, car.container = CreateCarObjects(dims.car)
-	car.carHeight = dims.car.boxHeight
-	car.yOffset = yOffset
-
+	car.objects, car.image = CreateCarObjects(dims)
 	return car
 }

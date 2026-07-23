@@ -18,105 +18,136 @@ var (
 )
 
 
-//////////////////////////////////////////////////////////////
-// ElevatorCabin
+
+///////////////////////////////////////////////////////////
+// LEVEL ('upper case!')
 //
-type ElevatorCabin struct {
+type Level struct {
+  Number int32
+	Front  bool
+	Rear   bool
+}
+
+
+//////////////////////////////////////////////////////////////
+// Elevator
+//
+type Elevator struct {
+	bank string
+	image *fyne.Container
+
 	car *Car
-	background *fyne.Container
+
 	dimensions ElevatorDimensions
+	levels []*Level
 }
 
-func NewElevatorCabin() ElevatorCabin {
-	return ElevatorCabin{}
-}
-
-func (e ElevatorCabin) Place(floor int) {
-
-	log.Println("@Place: (global)", yOffset)
-	xPix, yPix := e.car.SetToFloor(floor, e.dimensions.positions)
-	if xPix < 0 && yPix < 0 {
-		return
+func NewElevator(bank string) *Elevator {
+	return &Elevator{
+		bank: bank,
 	}
-
-	e.car.container.Move(fyne.NewPos(xPix, float32(yOffset) - yPix))
 }
 
 
-// PositionCoordinates
-//  return the xy pixel coordinates of the floor area requested.
-//  say 'lobby, rear' is requested, two pairs of xy-coordinates for
-//  the start and end of the area are returned.
-//
-func (e ElevatorCabin) PositionCoordinates(floor int, floorposition string, door int) {
+func (e *Elevator) Dimension(dims fyne.Size, floors int) {
 
+	e.dimensions = ElevatorDimensions{}
+	e.dimensions = e.dimensions.Dimensions(
+		int(dims.Height),
+		int(dims.Width), floors,
+	)
 }
 
 
-//////////////////////////////////////////////////////////////
-// CarPositions
-// holds xy-pixel coords of car position at floors
-var CarPositions []CarPosition
+func (e *Elevator) Levels(landings []*Landing) {
+	
+	e.levels = make([]*Level, 0)
+	
+	landIndex := 0
+	for pi := 0; pi < e.dimensions.floorsCount; pi++ {
+		
+		done := false
+		for n := landIndex; !done ;landIndex++ {
+			landing := landings[n]
+			
+			if int(landing.Floor) == pi {
+				level := &Level{
+					Number: int32(landing.Floor),
+					Front: landing.Door == 0 || landing.Door == 2,
+					Rear:  landing.Door == 2 || landing.Door == 1,
+				}
+				
+				e.levels = append(e.levels, level)
+				done = true  // advance landIndex
+				
+			} else {
+				e.levels = append(e.levels, nil)
+				break   // don't advance landIndex
+			}
+		}
+	}
+}
 
 
+func (e *Elevator) Car(car string) {
+	e.car = CreateCar(car, e.dimensions.car)
+}
 
-//////////////////////////////////////////////////////////////
-// CreateElevatorCabin
-// creates all objects needed to render an elevator cabin
-//
-//  NewDims() returns {floor: FloorDimensions, positions: []CarPosition}
-
-func CreateElevatorCabin(dims fyne.Size, levels []*Level) ElevatorCabin {
-	log.Println("New elevator cabin")
-
-	newCabin := NewElevatorCabin()
-	newCabin.dimensions = ElevatorDims(dims,levels)
-
-	newCabin.background = Background(dims, newCabin.dimensions, levels)
-	newCabin.car = CabinCar(newCabin.dimensions)
-
-	return newCabin
+func (e *Elevator) SetCar(floor int) {
+	//	e.image.Add(e.car.image)
 }
 
 // ElevatorDims
 //
-func ElevatorDims(winDims fyne.Size, floors []*Level) ElevatorDimensions {
+func ElevatorDims(winDims fyne.Size, floors int) ElevatorDimensions {
 
-	dims := ElevatorDimensions{}
-	dims.floor, dims.car = SetDimensions(int(winDims.Height), int(winDims.Width), len(floors))
-	dims.positions = SetCarPositions(floors, dims.floor)
-
-	return dims
+	return ElevatorDimensions{}
 }
 
 
-// Background
-//
-func Background(win fyne.Size, dims ElevatorDimensions, levels []*Level) *fyne.Container {
+func (e *Elevator) Place(floor int) {
+	log.Println("@Place ElevatorCar: (global)", yOffset)
+}
 
-	cont := container.NewWithoutLayout()
+
+// Image
+//
+func (e *Elevator) Image(win fyne.Size) {
+
+	e.image = container.NewWithoutLayout()
 
 	// Background rectangle
-	//
-	backgroundbox := canvas.NewRectangle(DARK)
-	backgroundbox.Resize(win)
-	backgroundbox.SetMinSize(win)
-	cont.Add(backgroundbox)
+	imagebox := canvas.NewRectangle(DARK)
+	imagebox.Resize(win)
+	imagebox.SetMinSize(win)
 
+	e.image.Add(imagebox)
+
+
+	dims := e.dimensions
+	log.Println("@e.Image dims", e.dimensions)
 
 	// Floors
 	//
-	for index, level := range levels {
+	log.Println(" ready for levels ...")
+	for index, level := range e.levels {
+		log.Println("index", index)
+
+		if level == nil {
+			log.Println("NIL")
+			continue  // a floor this elevator does not service
+		}
 
 		height := index*dims.floor.floorHeight + dims.floor.bottomLevel
 		flObj := CreateFloorObject(int(win.Height), height, dims, level.Front, level.Rear)
 
 		for _, obj := range flObj {
-			cont.Add(obj)
+			log.Println(" ... obj added")
+			e.image.Add(obj)
 		}
 	}
 
-	return cont
+	return
 }
 
 

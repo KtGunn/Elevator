@@ -46,7 +46,6 @@ func CreateRobotObjects(cardims CarDimensions) (*RobotObjects, *fyne.Container, 
 	robot.Add(body)
 	robot.Add(wheel)
 	wheel.Move(fyne.NewPos(0.5*float32(widthPixels-wheelPixels), float32(heightPixels)))
-	//wheel.Move(fyne.NewPos(0.5*float32(widthPixels-wheelPixels), -0.5*float32(wheelPixels)))
 
 	objs := NewRobotObjects()
 	objs.body = body

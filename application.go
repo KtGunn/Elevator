@@ -2,51 +2,96 @@ package main
 
 import (
 	//"log"
-	"fmt"
+	//"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 )
 
 
-var yOffset int
-
-var ApplicationInstance Application
-
 type Application struct {
 	app  fyne.App
 	win  fyne.Window
 	dims fyne.Size
 }
+
+var ApplicationInstance Application
+
 func NewApplication() Application {
 	return Application{}
 }
 
 
-var CabinObjects []CabinObject
+var Elevators []*Elevator
 var Robots []*Robot
+var yOffset int
 
+func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 
+  ApplicationInstance = NewApp(windowDims)
+	content := container.NewHBox()
 
-func NewElevator(bank string, car string, landings []*Landing,
-	dims fyne.Size) CabinObject {
+	for _, bank := range banks {
+		for _, car := range bank.Cars {
 
-	cabinObj := NewCabinObject(bank, car)
+			cabinObj := AddElevator(bank.Name, car.Name, car.Landings, windowDims)
+			Elevators = append(Elevators, cabinObj)
+
+			cont := container.NewWithoutLayout()
+			cont.Add(cabinObj.image)
+			cont.Add(cabinObj.car.image)
+			content.Add(cont)
+		}
+	}
+
+	// AddRobots()
+
+	windowSize := fyne.NewSize(
+		windowDims.Width*float32(len(Elevators)),
+		windowDims.Height,
+	)
+
+	ApplicationInstance.win.SetContent(content)
+	ApplicationInstance.win.Resize(windowSize)
+
+	//CreateControls(ApplicationInstance.app, banks)
+
+	ApplicationInstance.win.ShowAndRun()
+}
+
+func AddElevator(bank string, car string, landings []*Landing,
+	dims fyne.Size) *Elevator {
+
+	floors := NumberOfFloors()
+	elevator := NewElevator(bank)
+
+	elevator.Dimension(dims, floors)
+	elevator.Levels(landings)
+	elevator.Image(dims)
+
+	elevator.Car(car)
+	elevator.SetCar(0)
+
+	/*
+	elevator := NewElevator(bank, car)
 	levels := CabinToLevels(landings)
 
-	cabinObj.elevator = CreateElevatorCabin(dims, levels)
+	elevator.elevator = CreateElevatorCabin(dims, levels)
 
-	image := container.NewWithoutLayout(cabinObj.elevator.background)
-	image.Add(cabinObj.elevator.car.container)
-	cabinObj.elevator.Place(0)
+	image := container.NewWithoutLayout(elevator.elevator.background)
+	image.Add(elevator.elevator.car.container)
+	elevator.elevator.Place(0)
 
-	cabinObj.image = image
-	return cabinObj
+	elevator.image = image
+	*/
+	
+	return elevator
 }
 
 func AddRobots() {
 
-	for n, cabinObj := range CabinObjects {
+	/*
+	for n, cabinObj := range Elevators {
 
 		robot := CreateRobot(fmt.Sprintf("Tug-%d", n), cabinObj.elevator.dimensions.car)
 		Robots = append(Robots, robot)
@@ -57,45 +102,16 @@ func AddRobots() {
 		cabinObj.image.Add(robot.image)
 		robot.Place(0, cabinObj.elevator.dimensions)
 	}
+	*/
 }
 
 
 
-func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
-
-  ApplicationInstance = NewApp(windowDims)
-
-	content := container.NewHBox()
-
-	for _, bank := range banks {
-		for _, car := range bank.Cars {
-
-			cabinObj := NewElevator(bank.Name, car.Name, car.Landings, windowDims)
-			CabinObjects = append(CabinObjects, cabinObj)
-			content.Add(cabinObj.image)
-		}
-	}
-
-	AddRobots()
-
-	windowSize := fyne.NewSize(
-		windowDims.Width*float32(len(CabinObjects)),
-		windowDims.Height,
-	)
-
-	ApplicationInstance.win.SetContent(content)
-	ApplicationInstance.win.Resize(windowSize)
-
-	CreateControls(ApplicationInstance.app, banks)
-
-	ApplicationInstance.win.ShowAndRun()
-}
 
 func NewApp(windowDims fyne.Size) Application {
 
 	newApp := NewApplication()
 	newApp.dims = windowDims
-
 
 	newApp.app= app.New()
 	newApp.win = newApp.app.NewWindow("Cabin")
@@ -119,11 +135,13 @@ func RobotFromName(name string) *Robot {
 	return nil
 }
 
-func CabinObjFromCar(car *Car) CabinObject {
-	for _, cobj := range CabinObjects {
+func CabinObjFromCar(car *Car) Elevator {
+	/*
+	for _, cobj := range Elevators {
 		if cobj.elevator.car == car {
 			return cobj
 		}
 	}
-	return CabinObject{}
+	*/
+	return Elevator{}
 }

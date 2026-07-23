@@ -15,11 +15,11 @@ import (
 //   size ratios: hallway(10) lobby(10) cabin(6)
 //
 const (
-	WIDTH_CAR   int = 10
+	WIDTH_CAR   int = 10  // Relative dimensions
 	WIDTH_LOBBY int = 12
 	WIDTH_HALL  int = 18
-
-	HEIGHT_BOX_MAX int = 50
+	
+	HEIGHT_BOX_MAX int = 50 // Absolute pixel dimensions
 	WIDTH_BOX_MAX  int = 50
 
 	VERTICAL_PIXEL_MARGIN int = 2
@@ -27,33 +27,81 @@ const (
 
 
 
-
 /////////////////////////////////////////////////////////////////////
 // ACTUAL FLOOR DIMENSIONS in pixels.
 //
+type FloorDimensions struct {
+	hallLength   int
+	lobbyLength  int
+	carVoid      int
+
+	floorHeight  int
+	bottomLevel int
+}
+
+
+
+/////////////////////////////////////////////////////////////////////
+//  FLOOR POSITIONS
+//
+//                  fOut               rOut
+//   o-----x-----o-x--x--x-o|__x__|o-x--x--x-o----x----0
+//      fHall    fLby   fAtC  InC   rAtC  rLby   rHall
+//   
+const (
+	FRONT_SIDE int = 1
+	REAR_SIDE  int = 2
+)
+
+func (d FloorDimensions) xPosition(side int, pcol int) int {
+	
+	var pos int
+	
+	switch pcol {
+	case PCOL_RESERVE:
+		pos = d.hallLength/2
+	case PCOL_LOBBY:
+		pos = d.hallLength + 2
+	case PCOL_OUTCAR:
+		pos = d.hallLength + d.lobbyLength/2
+	case PCOL_ATCAR:
+		pos = d.hallLength + d.lobbyLength-2
+	case PCOL_INCAR:
+		pos = d.hallLength + d.lobbyLength + d.carVoid/2
+	case PCOL_DONE:
+		pos = 5
+	default:
+		return 0
+	}
+
+	switch side {
+
+	case FRONT_SIDE:
+		return pos
+
+	case REAR_SIDE:
+		return 2*(d.hallLength + d.lobbyLength) + d.carVoid - pos
+	}
+
+	return 0
+}
+
 type RobotDimensions struct {
 	bodyHeight int
 	bodyWidth  int
 	wheelDia   int
 }
 
-type FloorDimensions struct {
-	hallLength   int
-	lobbyLength  int
-	floors       int
-	floorHeight  int
-	bottomLevel int
-}
-
 // Cabin & Doors
 //
-//    ______________
-//    |_         __|
+//    |< carLength >|
+//    _______________
+//    |_         __|  ^
+//    | |        | |  |
+//    | |        | |  carheight
 //    | |        | |
-//    | |        | |
-//    | |        | |
-//    |_|________|_|
-//
+//    |_|________|_|  |
+//                    ^
 type CarDimensions struct {
 	carLength int
 	boxHeight int
@@ -65,27 +113,33 @@ type CarDimensions struct {
 type ElevatorDimensions struct {
 	floor     FloorDimensions
 	car       CarDimensions
-	positions   []CarPosition
+	floorsCount  int
 }
 
 
 
+func (d ElevatorDimensions) xyPosition(floor int, side int, pcol int) (int, int) {
+	x := d.floor.xPosition(side, pcol)
+	y := d.floor.bottomLevel + floor * d.floor.floorHeight
+	return x,y
+}
 
-func SetDimensions(winHeight int, winWidth int, floors int) (FloorDimensions, CarDimensions) {
 
-	var floorDims FloorDimensions = FloorDimensions{
-		floors: floors,
-	}
+func (d ElevatorDimensions) Dimensions(winHeight int, winWidth int, floors int) ElevatorDimensions {
 
-	var carDims CarDimensions = CarDimensions{}
+	d.floor = FloorDimensions{}
+	d.car = CarDimensions{}
 	
-	floorDims.floorHeight, carDims.boxHeight, floorDims.bottomLevel =
-		FloorAndCabHeights(winHeight, winWidth, floorDims.floors)
+	d.floor.floorHeight, d.car.boxHeight, d.floor.bottomLevel =
+		FloorAndCabHeights(winHeight, winWidth, floors)
 
-	carDims.carLength, floorDims.lobbyLength, floorDims.hallLength =
+	d.car.carLength, d.floor.lobbyLength, d.floor.hallLength =
 		AllocateDimensions(int(winHeight), int(winWidth))
 
-	return floorDims, carDims
+	d.floor.carVoid = d.car.carLength
+	d.floorsCount = floors
+
+	return d
 }
 
 
@@ -132,49 +186,3 @@ func AllocateDimensions(overallHeight int, overallWidth int) (int, int, int) {
 
 
 
-// SetCarPositions
-// The function returns a slice of CarPositions for each level
-// The car positions are used to place the car in the display
-// given the level or floor it is on.
-//
-// -- NOTE mauybe I should be using a map instead of a slice?
-//
-func SetCarPositions(levels []*Level, floorDims FloorDimensions) []CarPosition {
-
-	carPositions := []CarPosition{}
-	xCoord := floorDims.hallLength + floorDims.lobbyLength
-	
-	for _, level := range levels {
-		number := int(level.Number)
-		yCoord := number*floorDims.floorHeight + floorDims.bottomLevel
-		carPositions = append(carPositions, CarPosition{
-			level: number,
-			xPixCoord: xCoord,
-			yPixCoord: yCoord,
-		})
-	}
-
-	return carPositions
-}
-
-
-
-// CabinToLevels
-//  Translates Landings from input json file into the Level structure
-//  used to draw the elevator cabin.
-//
-func CabinToLevels(landings []*Landing) []*Level {
-
-	var levels []*Level
-
-	for _, landing := range landings {
-		level := &Level{
-			Number: int32(landing.Floor),
-			Front: landing.Door == 0 || landing.Door == 2,
-			Rear:  landing.Door == 2 || landing.Door == 1,
-		}
-		levels = append(levels, level)
-	}
-
-	return levels
-}

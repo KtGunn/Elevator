@@ -14,47 +14,45 @@ const (
 	PCOL_OUTCAR  int = 5
 )
 
-func Pcol(state int) string {
-	switch state {
-	case PCOL_RESERVE:
-		return "Reserve"
-	case PCOL_LOBBY:
-		return "Lobby"
-	case PCOL_ATCAR:
-		return "Atcar"
-	case PCOL_INCAR:
-		return "Incar"
-	case PCOL_OUTCAR:
-		return "Outcar"
-	case PCOL_DONE:
-		return "Done"
-	default:
-		return "Dunno!"
-	}
+
+var Protocol map[int]string = map[int]string{
+	PCOL_RESERVE: "Reserve",
+	PCOL_LOBBY: "Lobby",
+	PCOL_ATCAR: "Atcar" ,
+	PCOL_INCAR: "Incar",
+	PCOL_OUTCAR: "Outcar",
+	PCOL_DONE: "Done",
 }
 
-func ToPcol(state string) int {
-	switch state {
-	case "Reserve":
-		return PCOL_RESERVE 
-	case "Lobby":
-		return PCOL_LOBBY
-	case "Atcar":
-		return PCOL_ATCAR
-	case "Incar":
-		return PCOL_INCAR
-	case "Outcar":
-		return PCOL_OUTCAR
-	case "Done":
-		return PCOL_DONE
-	default:
-		return -1
-	}
-}
 
 func AllStates() []string {
-	return  []string{"Reserve", "Lobby", "Atcar" , "Incar", "Outcar", "Done",}
+	var states []string
+	for _, label := range Protocol {
+		states = append(states, label)
+	}
+	return states
 }
+
+
+func Pcol(state int) string {
+	label, ok := Protocol[state]
+	if !ok {
+		return ""
+	}
+	return label
+}
+
+
+func ToPcol(state string) int {
+	log.Println("ToPcol", state)
+	for pcol, label := range Protocol {
+		if state == label {
+			return pcol
+		}
+	}
+	return -1
+}
+
 
 type RobotState struct {
 	car *Car
