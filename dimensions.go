@@ -53,6 +53,10 @@ const (
 	REAR_SIDE  int = 2
 )
 
+func (d FloorDimensions) yPosition(floor int) int {
+	return d.bottomLevel + floor * d.floorHeight
+}
+
 func (d FloorDimensions) xPosition(side int, pcol int) int {
 	
 	var pos int
@@ -67,6 +71,7 @@ func (d FloorDimensions) xPosition(side int, pcol int) int {
 	case PCOL_ATCAR:
 		pos = d.hallLength + d.lobbyLength-2
 	case PCOL_INCAR:
+		log.Println(" -- InCar -- ")
 		pos = d.hallLength + d.lobbyLength + d.carVoid/2
 	case PCOL_DONE:
 		pos = 5

@@ -24,7 +24,12 @@ func NewApplication() Application {
 
 var Elevators []*Elevator
 var Robots []*Robot
+
 var yOffset int
+
+func toCanvasFrame(x int, y int) (int, int) {
+	return x, yOffset - y
+}
 
 func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 
@@ -54,7 +59,7 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 	ApplicationInstance.win.SetContent(content)
 	ApplicationInstance.win.Resize(windowSize)
 
-	//CreateControls(ApplicationInstance.app, banks)
+	CreateControls(ApplicationInstance.app, banks)
 
 	ApplicationInstance.win.ShowAndRun()
 }
@@ -124,6 +129,15 @@ func NewApp(windowDims fyne.Size) Application {
 	yOffset = int(windowDims.Height)
 
 	return newApp
+}
+
+func GetElevator(name string) *Elevator {
+	for _,el := range Elevators {
+		if el.car.name == name {
+			return el
+		}
+	}
+	return nil
 }
 
 func RobotFromName(name string) *Robot {

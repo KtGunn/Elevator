@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"encoding/json"
@@ -75,3 +76,27 @@ func ShowBanks(banks []*Bank) {
 	log.Println("Min floor", min, "max floor", max)
 }
 
+func CabinNames(banks []*Bank) []string {
+	var names []string
+	for _, b := range banks {
+		for _, c := range b.Cars {
+			names = append(names, c.Name)
+		}
+	}
+	return names
+}
+
+func CabinFloors(cabin string, banks []*Bank) []string {                                              
+  var floors []string                                                                                 
+	
+  for _, b := range banks {                                                                           
+    for _, c := range b.Cars {                                                                        
+      if c.Name == cabin {                                                                            
+        for _, l := range c.Landings {                                                                
+          floors = append(floors, fmt.Sprintf("%d", l.Floor))                                         
+        }                                                                                             
+      }                                                                                               
+    }                                                                                                 
+  }
+	return floors
+}

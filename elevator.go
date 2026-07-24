@@ -94,7 +94,15 @@ func (e *Elevator) Car(car string) {
 }
 
 func (e *Elevator) SetCar(floor int) {
-	//	e.image.Add(e.car.image)
+	x := e.dimensions.floor.xPosition(FRONT_SIDE, PCOL_INCAR)
+	y := e.dimensions.floor.yPosition(floor)
+
+	x -= e.dimensions.car.carLength/2
+	y += e.dimensions.car.boxHeight
+	
+	x, y = toCanvasFrame(x,y)
+	e.car.image.Move(fyne.NewPos(float32(x), float32(y)))
+
 }
 
 // ElevatorDims
@@ -105,10 +113,11 @@ func ElevatorDims(winDims fyne.Size, floors int) ElevatorDimensions {
 }
 
 
+/* NO LONGER NEEDED
 func (e *Elevator) Place(floor int) {
 	log.Println("@Place ElevatorCar: (global)", yOffset)
 }
-
+*/
 
 // Image
 //
