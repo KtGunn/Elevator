@@ -6,16 +6,6 @@ import (
 
 
 ///////////////////////////////////////////////////////////
-// LEVEL ('upper case!')
-//
-type Level struct {
-  Number int32
-	Front  bool
-	Rear   bool
-}
-
-
-///////////////////////////////////////////////////////////
 // I/O structures
 // These are used with a json file for input
 //
@@ -35,12 +25,6 @@ type Landing struct {
 
 
 
-
-type CarPosition struct {
-	level int
-	xPixCoord int
-	yPixCoord int
-}
 
 type FloorObject struct {
 	shape    fyne.CanvasObject

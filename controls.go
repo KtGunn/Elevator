@@ -20,7 +20,10 @@ func CreateControls(app fyne.App, banks []*Bank) {
 	height := 600
 	win.Resize(fyne.NewSize(float32(width), float32(height)))
 
+	//cabinSide, _, _ := CabinControls(app, banks)
 	cabinSide, cabinSelector, floorSelector := CabinControls(app, banks)
+
+	//robotSide := RobotControls(app, banks)
 	robotSide := RobotControls(app, banks, cabinSelector, floorSelector)
 
 	win.SetContent(container.NewHBox(
@@ -37,12 +40,19 @@ func CabinControls(app fyne.App, banks []*Bank) (*fyne.Container, *widget.Select
 
 	var cabinSelector *widget.Select
 
-	floorSelector := widget.NewSelect(nil, func(picked string) {
-		fmt.Println("selected floor:", picked)
 
-		cobj, err := GetCabinObject("", cabinSelector.Selected)
-		if err != nil {
-			fmt.Println("error getting cabin object:", err)
+	// FLOOR SELECTION
+	//
+	floorSelector := widget.NewSelect(nil, func(picked string) {
+
+		if picked == "" {
+			fmt.Println("... empty floor selected. bye...")
+			return
+		}
+		
+		elev := GetElevator(cabinSelector.Selected)
+		if elev == nil {
+			fmt.Println("failed to get Elevator for ", cabinSelector.Selected)
 			return
 		}
 
@@ -52,12 +62,17 @@ func CabinControls(app fyne.App, banks []*Bank) (*fyne.Container, *widget.Select
 			return
 		}
 
-		fmt.Println("moving cabin", cobj.cabin, "to floor", floor)
-		cobj.elevator.Place(floor)
+		fmt.Println("moving car", picked, "to floor", floor)
+		elev.SetCar(floor)
 	})
+
 	floorSelector.PlaceHolder = "Pick a floor"
 
+
+	// CABIN SELECTION
+	//
 	cabinSelector = widget.NewSelect(CabinNames(banks), func(picked string) {
+		
 		// Set floor selectors
 		floors := CabinFloors(picked, banks)
 		floorSelector.Options = floors
@@ -65,32 +80,35 @@ func CabinControls(app fyne.App, banks []*Bank) (*fyne.Container, *widget.Select
 		floorSelector.PlaceHolder = "Move to floor"
 		floorSelector.Refresh()
 	})
+
 	cabinSelector.PlaceHolder = "Pick a cabin"
 
+
+
+	// DOOR ACTION SELECTION
+	//
 	var ops []string = []string{
 		"Open Front Door",
 		"Close Front Door",
 		"Open Rear Door",
 		"Close Rear Door",
 	}
-	opSelector := widget.NewSelect(ops, func(picked string) {
-		fmt.Println("Door action ..")
 
-		cobj, err := GetCabinObject("", cabinSelector.Selected)
-		if err != nil {
-			fmt.Println("error getting cabin object:", err)
+	opSelector := widget.NewSelect(ops, func(picked string) {
+
+		elev := GetElevator(cabinSelector.Selected)
+		if elev == nil {
+			fmt.Println("failed to get Elevator for ", cabinSelector.Selected)
 			return
 		}
-		// VERIFY
-		fmt.Println("  bank", cobj.bank, " cabin", cobj.cabin)
-
+		
 		door, action := DoorAndAction(picked)
 
 		switch action {
 		case DOOR_OPEN:
-			cobj.elevator.car.OpenDoor(door)
+			elev.car.OpenDoor(door)
 		case DOOR_CLOSED:
-			cobj.elevator.car.CloseDoor(door)
+			elev.car.CloseDoor(door)
 		}
 
 	})
@@ -102,20 +120,20 @@ func CabinControls(app fyne.App, banks []*Bank) (*fyne.Container, *widget.Select
 		opSelector,
 		floorSelector,
 	), cabinSelector, floorSelector
-
+	
 }
 
 func RobotControls(app fyne.App, banks []*Bank,
 	cabinSelector *widget.Select,
 	floorSelector *widget.Select) *fyne.Container {
-
+	
 	var robotSelector *widget.Select
 	var stateSelector *widget.Select
-
+	
 	// PCOL state
 	//
 	stateSelector = widget.NewSelect(AllStates(), func(picked string) {
-
+		
 		if picked == "" {
 			return // Prevent infinite loop when ClearSelected is called
 		}
@@ -133,13 +151,11 @@ func RobotControls(app fyne.App, banks []*Bank,
 	})
 	stateSelector.PlaceHolder = "?"
 
+
 	// ROBOT
 	//
 	robotSelector = widget.NewSelect(RobotNames(Robots), func(robotName string) {
-		fmt.Println("Selected Cabin from CabinControls:", cabinSelector.Selected)
-		fmt.Println("Selected Floor from CabinControls:", floorSelector.Selected)
 
-		// robot --> car --> floor --> state
 		robot := RobotFromName(robotName)
 
 		floor, err := strconv.Atoi(floorSelector.Selected)
@@ -154,14 +170,14 @@ func RobotControls(app fyne.App, banks []*Bank,
 			return
 		}
 
-		cobj, err := GetCabinObject("", cabinSelector.Selected)
-		if err != nil {
-			fmt.Println("error getting cabin object:", err, "Bye...")
+		elev := GetElevator(cabinSelector.Selected)
+		if elev == nil {
+			fmt.Println("failed to get Elevator for ", cabinSelector.Selected)
 			return
 		}
 
 		fmt.Println(robotName, floor, pcolInt)
-		robot.Place(floor, cobj.elevator.dimensions)
+		robot.Place(floor, pcolInt, FRONT_SIDE, elev.dimensions)
 
 	})
 	robotSelector.PlaceHolder = "Pick robot"
@@ -171,6 +187,17 @@ func RobotControls(app fyne.App, banks []*Bank,
 		stateSelector,
 	)
 }
+
+
+func RobotNames(robots []*Robot) []string {
+	var names []string
+	for _, robot := range robots {
+		names = append(names, robot.name)
+	}
+	return names
+}
+
+
 
 func DoorAndAction(label string) (door int, op int) {
 
@@ -187,38 +214,4 @@ func DoorAndAction(label string) (door int, op int) {
 	}
 
 	return door, op
-}
-
-func RobotNames(robots []*Robot) []string {
-	var names []string
-	for _, robot := range robots {
-		names = append(names, robot.name)
-	}
-	return names
-}
-
-func CabinNames(banks []*Bank) []string {
-	var names []string
-	for _, b := range banks {
-		for _, c := range b.Cars {
-			names = append(names, c.Name)
-		}
-	}
-	return names
-}
-
-func CabinFloors(cabin string, banks []*Bank) []string {
-	var floors []string
-
-	for _, b := range banks {
-		for _, c := range b.Cars {
-			if c.Name == cabin {
-				for _, l := range c.Landings {
-					floors = append(floors, fmt.Sprintf("%d", l.Floor))
-				}
-			}
-		}
-	}
-
-	return floors
 }

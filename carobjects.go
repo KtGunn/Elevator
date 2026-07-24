@@ -1,7 +1,7 @@
 package main
 
 import (
-
+	"log"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/canvas"
@@ -47,6 +47,6 @@ func CreateCarObjects(cardims CarDimensions) (*CarObjects, *fyne.Container) {
 	box.Add(car.box)
 	box.Add(car.front)
 	box.Add(car.rear)
-
+	log.Println("box", box)
 	return car, box
 }
