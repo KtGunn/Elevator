@@ -84,11 +84,16 @@ func (r *Robot) SetFloorState(state int) {
 	r.state.floorState = state
 }
 
-func (r *Robot) Place(floor int, dims ElevatorDimensions) {
+func (r *Robot) Place(floor int, pcol int, side int, dims ElevatorDimensions) {
 	log.Println("@Place floor=", floor)
 	
-	xPix, yPix := r.positionAt(floor, dims)
-	r.image.Move(fyne.NewPos(xPix, float32(yOffset)-yPix))
+	x := dims.floor.xPosition(side, pcol)
+	y := dims.floor.yPosition(floor)
+
+	y += r.dimensions.bodyHeight
+
+	x, y = toCanvasFrame(x,y)
+	r.image.Move(fyne.NewPos(float32(x), float32(y)))
 }
 
 func (r *Robot) positionAt(floor int, dims ElevatorDimensions) (float32, float32) {

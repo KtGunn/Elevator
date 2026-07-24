@@ -20,13 +20,15 @@ func CreateControls(app fyne.App, banks []*Bank) {
 	height := 600
 	win.Resize(fyne.NewSize(float32(width), float32(height)))
 
-	cabinSide, _, _ := CabinControls(app, banks)
-	//cabinSide, cabinSelector, floorSelector := CabinControls(app, banks)
+	//cabinSide, _, _ := CabinControls(app, banks)
+	cabinSide, cabinSelector, floorSelector := CabinControls(app, banks)
+
+	robotSide := RobotControls(app, banks, cabinSelector, floorSelector)
 	//robotSide := RobotControls(app, banks, cabinSelector, floorSelector)
 
 	win.SetContent(container.NewHBox(
 		cabinSide,
-		//robotSide,
+		robotSide,
 	))
 
 	win.Resize(fyne.NewSize(200, 200))
@@ -118,21 +120,20 @@ func CabinControls(app fyne.App, banks []*Bank) (*fyne.Container, *widget.Select
 		opSelector,
 		floorSelector,
 	), cabinSelector, floorSelector
-
+	
 }
 
-/*
-   func RobotControls(app fyne.App, banks []*Bank,
+func RobotControls(app fyne.App, banks []*Bank,
 	cabinSelector *widget.Select,
 	floorSelector *widget.Select) *fyne.Container {
-
+	
 	var robotSelector *widget.Select
 	var stateSelector *widget.Select
-
+	
 	// PCOL state
 	//
 	stateSelector = widget.NewSelect(AllStates(), func(picked string) {
-
+		
 		if picked == "" {
 			return // Prevent infinite loop when ClearSelected is called
 		}
@@ -150,13 +151,11 @@ func CabinControls(app fyne.App, banks []*Bank) (*fyne.Container, *widget.Select
 	})
 	stateSelector.PlaceHolder = "?"
 
+
 	// ROBOT
 	//
 	robotSelector = widget.NewSelect(RobotNames(Robots), func(robotName string) {
-		fmt.Println("Selected Cabin from CabinControls:", cabinSelector.Selected)
-		fmt.Println("Selected Floor from CabinControls:", floorSelector.Selected)
 
-		// robot --> car --> floor --> state
 		robot := RobotFromName(robotName)
 
 		floor, err := strconv.Atoi(floorSelector.Selected)
@@ -171,14 +170,14 @@ func CabinControls(app fyne.App, banks []*Bank) (*fyne.Container, *widget.Select
 			return
 		}
 
-		cobj, err := GetCabinObject("", cabinSelector.Selected)
-		if err != nil {
-			fmt.Println("error getting cabin object:", err, "Bye...")
+		elev := GetElevator(cabinSelector.Selected)
+		if elev == nil {
+			fmt.Println("failed to get Elevator for ", cabinSelector.Selected)
 			return
 		}
 
 		fmt.Println(robotName, floor, pcolInt)
-		robot.Place(floor, cobj.elevator.dimensions)
+		robot.Place(floor, pcolInt, FRONT_SIDE, elev.dimensions)
 
 	})
 	robotSelector.PlaceHolder = "Pick robot"
@@ -198,7 +197,7 @@ func RobotNames(robots []*Robot) []string {
 	return names
 }
 
-*/
+
 
 func DoorAndAction(label string) (door int, op int) {
 

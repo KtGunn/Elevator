@@ -2,7 +2,7 @@ package main
 
 import (
 	//"log"
-	//"fmt"
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -49,7 +49,7 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 		}
 	}
 
-	// AddRobots()
+	AddRobots()
 
 	windowSize := fyne.NewSize(
 		windowDims.Width*float32(len(Elevators)),
@@ -77,37 +77,22 @@ func AddElevator(bank string, car string, landings []*Landing,
 	elevator.Car(car)
 	elevator.SetCar(0)
 
-	/*
-	elevator := NewElevator(bank, car)
-	levels := CabinToLevels(landings)
-
-	elevator.elevator = CreateElevatorCabin(dims, levels)
-
-	image := container.NewWithoutLayout(elevator.elevator.background)
-	image.Add(elevator.elevator.car.container)
-	elevator.elevator.Place(0)
-
-	elevator.image = image
-	*/
-	
 	return elevator
 }
 
 func AddRobots() {
 
-	/*
-	for n, cabinObj := range Elevators {
+	for n, elev := range Elevators {
 
-		robot := CreateRobot(fmt.Sprintf("Tug-%d", n), cabinObj.elevator.dimensions.car)
+		robot := CreateRobot(fmt.Sprintf("Tug-%d", n), elev.dimensions.car)
 		Robots = append(Robots, robot)
 
-		robot.AssignCar(cabinObj.elevator.car)
+		robot.AssignCar(elev.car)
 		robot.SetFloorState(PCOL_LOBBY)
 
-		cabinObj.image.Add(robot.image)
-		robot.Place(0, cabinObj.elevator.dimensions)
+		elev.image.Add(robot.image)
+		robot.Place(0, PCOL_RESERVE, FRONT_SIDE, elev.dimensions)
 	}
-	*/
 }
 
 
