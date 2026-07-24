@@ -23,8 +23,8 @@ func CreateControls(app fyne.App, banks []*Bank) {
 	//cabinSide, _, _ := CabinControls(app, banks)
 	cabinSide, cabinSelector, floorSelector := CabinControls(app, banks)
 
+	//robotSide := RobotControls(app, banks)
 	robotSide := RobotControls(app, banks, cabinSelector, floorSelector)
-	//robotSide := RobotControls(app, banks, cabinSelector, floorSelector)
 
 	win.SetContent(container.NewHBox(
 		cabinSide,
