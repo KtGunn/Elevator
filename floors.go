@@ -45,7 +45,7 @@ func (f *Floors) AddRobot(robot *Robot, floor int) {
 	onFloor = append(onFloor, robot)
 	f.occupation[floor] = onFloor
 
-	robot.OnFloor(floor)
+	//robot.OnFloor(floor)
 }
 
 func (f *Floors) RemoveRobot(robot *Robot) {

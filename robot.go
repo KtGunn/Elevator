@@ -17,11 +17,11 @@ const (
 
 var Protocol map[int]string = map[int]string{
 	PCOL_RESERVE: "Reserve",
-	PCOL_LOBBY: "Lobby",
-	PCOL_ATCAR: "Atcar" ,
-	PCOL_INCAR: "Incar",
-	PCOL_OUTCAR: "Outcar",
-	PCOL_DONE: "Done",
+	PCOL_LOBBY:   "Lobby",
+	PCOL_ATCAR:   "Atcar" ,
+	PCOL_INCAR:   "Incar",
+	PCOL_OUTCAR:  "Outcar",
+	PCOL_DONE:    "Done",
 }
 
 
@@ -89,45 +89,27 @@ func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) {
 		elev.AddRobot(r.image)
 	}
 
-	r.state.car = elev.car
-	r.state.floorNow = floor
-	
+	if pcol == PCOL_DONE {
+		log.Println(" Removing a robot ")
+
+		elev.RemoveRobot(r.image)
+		//Decks.AddRobot(r, floor)
+
+		r.state.car = nil
+		r.state.floorNow = floor
+
+		return
+	}
+
 	
 	dims := elev.dimensions.floor
-	
 	x := dims.xPosition(side, pcol)
-	y := dims.yPosition(floor)
-	
-	y += r.dimensions.bodyHeight
+	y := dims.yPosition(floor) + r.dimensions.bodyHeight
 	
 	x, y = toCanvasFrame(x,y)
 	r.image.Move(fyne.NewPos(float32(x), float32(y)))
-		
 }
 
-
-func (r *Robot) positionAt(floor int, dims ElevatorDimensions) (float32, float32) {
-	log.Println("@positionAt floor=", floor)
-
-	floorY := floor*dims.floor.floorHeight + dims.floor.bottomLevel
-	bodyH := float32(r.dimensions.bodyHeight)
-	bodyW := float32(r.dimensions.bodyWidth)
-
-	var x float32
-	switch r.state.floorState {
-	case PCOL_INCAR:
-		log.Println("positionAt INCAR")
-		x = float32(dims.floor.hallLength + dims.floor.lobbyLength)
-	case PCOL_ATCAR:
-		log.Println("positionAt ATCAR")
-		x = float32(dims.floor.hallLength+dims.floor.lobbyLength) - bodyW
-	default:
-		log.Println("positionAt default", r.state.floorState)
-		x = float32(dims.floor.hallLength) + (float32(dims.floor.lobbyLength)-bodyW)/2
-	}
-
-	return x, float32(floorY) + bodyH
-}
 
 func CreateRobot(name string, dims CarDimensions) *Robot {
 	log.Println("@CreateRobot")

@@ -61,7 +61,8 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 
 			cont := container.NewWithoutLayout()
 			cont.Add(elev.image)
-			cont.Add(elev.car.image)
+			// [ktg 260727] add car to elevator's image
+			//cont.Add(elev.car.image)
 			content.Add(cont)
 		}
 	}

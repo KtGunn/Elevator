@@ -91,6 +91,8 @@ func (e *Elevator) Levels(landings []*Landing) {
 
 func (e *Elevator) Car(car string) {
 	e.car = CreateCar(car, e.dimensions.car)
+
+	e.image.Add(e.car.image)
 }
 
 func (e *Elevator) SetCar(floor int) {
@@ -113,10 +115,19 @@ func ElevatorDims(winDims fyne.Size, floors int) ElevatorDimensions {
 }
 
 
+func (e *Elevator) RemoveRobot(robot *fyne.Container) {
+	e.image.Remove(robot)
+	e.image.Refresh()
+}
+
+
 func (e *Elevator) AddRobot(robot *fyne.Container) {
 	e.image.Add(robot)
-	toFront(e.car.image, robot)
-	e.image.Refresh()
+
+	if false {  // NOT MECCESSARY!
+		toFront(e.car.image, robot)
+		e.image.Refresh()
+	}
 }
 
 
@@ -138,7 +149,6 @@ func toFront(parent *fyne.Container, target fyne.CanvasObject) {
 			parent.Objects = append(parent.Objects, target)
 
 			parent.Refresh()
-
 			break
 		}
 	}
