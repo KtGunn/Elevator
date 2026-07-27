@@ -123,6 +123,7 @@ func CabinControls(app fyne.App, banks []*Bank) (*fyne.Container, *widget.Select
 	
 }
 
+
 func RobotControls(app fyne.App, banks []*Bank,
 	cabinSelector *widget.Select,
 	floorSelector *widget.Select) *fyne.Container {
@@ -133,21 +134,7 @@ func RobotControls(app fyne.App, banks []*Bank,
 	// PCOL state
 	//
 	stateSelector = widget.NewSelect(AllStates(), func(picked string) {
-		
-		if picked == "" {
-			return // Prevent infinite loop when ClearSelected is called
-		}
-
-		robotName := robotSelector.Selected
-		var robot *Robot
-		if robot = RobotFromName(robotName); robot == nil {
-			fmt.Println("@stateSelector:", robotName, "is invalid. Bye...")
-			stateSelector.ClearSelected()
-			return
-		}
-
-		robot.SetFloorState(ToPcol(picked))
-		fmt.Println("selected state:", picked, "or", ToPcol(picked))
+		fmt.Println(" ...state selector done...")
 	})
 	stateSelector.PlaceHolder = "?"
 
@@ -155,7 +142,7 @@ func RobotControls(app fyne.App, banks []*Bank,
 	// ROBOT
 	//
 	robotSelector = widget.NewSelect(RobotNames(Robots), func(robotName string) {
-
+		fmt.Println("@Robot", robotName, "cabin", cabinSelector.Selected, "floor", floorSelector.Selected)
 		robot := RobotFromName(robotName)
 
 		floor, err := strconv.Atoi(floorSelector.Selected)
@@ -176,8 +163,8 @@ func RobotControls(app fyne.App, banks []*Bank,
 			return
 		}
 
-		fmt.Println(robotName, floor, pcolInt)
-		robot.Place(floor, pcolInt, FRONT_SIDE, elev.dimensions)
+		fmt.Println("R",robotName, "F", floor, "pS", pcolInt)
+		robot.WithElevator(elev, floor, pcolInt, FRONT_SIDE)
 
 	})
 	robotSelector.PlaceHolder = "Pick robot"

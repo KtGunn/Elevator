@@ -89,12 +89,6 @@ func AddRobots(appLayout *fyne.Container) {
 		Robots = append(Robots, robot)
 
 		Decks.AddRobot(robot, 0)
-
-		//robot.AssignCar(elev.car)
-		//robot.SetFloorState(PCOL_LOBBY)
-
-		//appLayout.Add(robot.image)
-		//robot.Place(0, PCOL_RESERVE, FRONT_SIDE, elev.dimensions)
 	}
 }
 

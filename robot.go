@@ -75,26 +75,36 @@ func NewRobot(name string) *Robot {
 	}
 }
 
-func (r *Robot) AssignCar(car *Car) {
-	r.state.car = car
+func (r *Robot) OnFloor(floor int) {
+	r.state.car = nil
+	r.state.floorNow = floor
 }
 
-func (r *Robot) SetFloorState(state int) {
-	log.Println("@SetFloorState state=", state)
-	r.state.floorState = state
-}
 
-func (r *Robot) Place(floor int, pcol int, side int, dims ElevatorDimensions) {
+func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) {
 	log.Println("@Place floor=", floor)
 	
-	x := dims.floor.xPosition(side, pcol)
-	y := dims.floor.yPosition(floor)
+	if r.state.car == nil {
+		Decks.RemoveRobot(r)
+		elev.AddRobot(r.image)
+	}
 
+	r.state.car = elev.car
+	r.state.floorNow = floor
+	
+	
+	dims := elev.dimensions.floor
+	
+	x := dims.xPosition(side, pcol)
+	y := dims.yPosition(floor)
+	
 	y += r.dimensions.bodyHeight
-
+	
 	x, y = toCanvasFrame(x,y)
 	r.image.Move(fyne.NewPos(float32(x), float32(y)))
+		
 }
+
 
 func (r *Robot) positionAt(floor int, dims ElevatorDimensions) (float32, float32) {
 	log.Println("@positionAt floor=", floor)

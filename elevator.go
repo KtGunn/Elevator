@@ -113,11 +113,36 @@ func ElevatorDims(winDims fyne.Size, floors int) ElevatorDimensions {
 }
 
 
-/* NO LONGER NEEDED
-func (e *Elevator) Place(floor int) {
-	log.Println("@Place ElevatorCar: (global)", yOffset)
+func (e *Elevator) AddRobot(robot *fyne.Container) {
+	e.image.Add(robot)
+	toFront(e.car.image, robot)
+	e.image.Refresh()
 }
-*/
+
+
+
+// toFront
+// moves the specified object to the very end of the container's list
+//
+func toFront(parent *fyne.Container, target fyne.CanvasObject) {
+	log.Println(" to Front")
+	
+	if parent == nil || target == nil {
+		return
+	}
+	
+	for i, obj := range parent.Objects {
+		if obj == target {
+			log.Println(" I found the target")
+			parent.Objects = append(parent.Objects[:i], parent.Objects[i+1:]...)
+			parent.Objects = append(parent.Objects, target)
+
+			parent.Refresh()
+
+			break
+		}
+	}
+}
 
 // Image
 //
