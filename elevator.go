@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"image/color"
 	"log"
 
@@ -32,6 +32,8 @@ type Elevator struct {
 	image *fyne.Container
 
 	dimensions ElevatorDimensions
+
+	rider *Robot
 
 	car    *Car
 	levels []*Level
@@ -100,8 +102,17 @@ func (e *Elevator) SetCar(floor int) {
 
 	x, y = toCanvasFrame(x, y)
 	e.car.image.Move(fyne.NewPos(float32(x), float32(y)))
+
+	if e.rider != nil {
+		e.rider.CarMoved(e.dimensions.floor, floor)
+	}
 }
 
+
+
+func (e *Elevator) AddRider(rider *Robot) {
+	e.rider = rider
+}
 
 func (e *Elevator) RemoveRobot(robot *fyne.Container) {
 	e.image.Remove(robot)

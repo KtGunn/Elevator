@@ -89,7 +89,6 @@ func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) bool
 		elev.AddRobot(r.image)
 
 		r.state.car = elev.car
-		r.state.floorNow = floor
 	}
 
 	if pcol == PCOL_DONE {
@@ -97,19 +96,42 @@ func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) bool
 
 		r.state.car = nil
 		r.state.floorNow = floor
+		r.state.floorState = pcol
 
 		return true
 	}
 
-	
-	dims := elev.dimensions.floor
+	if pcol == PCOL_INCAR {
+		elev.AddRider(r)
+	}
+
+	r.state.floorNow = floor
+	r.state.floorState = pcol
+	r.image.Move(r.floorPosition(elev.dimensions.floor, floor, pcol, side))
+
+	return false
+}
+
+
+func (r *Robot) floorPosition(dims FloorDimensions, floor int, pcol int,side int) fyne.Position {
+
 	x := dims.xPosition(side, pcol)
 	y := dims.yPosition(floor) + r.dimensions.bodyHeight
 	
 	x, y = toCanvasFrame(x,y)
-	r.image.Move(fyne.NewPos(float32(x), float32(y)))
+	return fyne.NewPos(float32(x), float32(y))
+}
 
-	return false
+
+func (r *Robot) CarMoved(dims FloorDimensions, floor int) {
+
+	if r.state.floorState != PCOL_INCAR {
+		log.Println("@CarMoved: car is NOT in car:", r.state.floorState)
+		return
+	}
+
+	r.state.floorNow = floor
+	r.image.Move(r.floorPosition(dims, floor, PCOL_INCAR, FRONT_SIDE))
 }
 
 

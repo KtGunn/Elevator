@@ -63,9 +63,6 @@ func (c *Car) CloseDoor(which int) {
 }
 
 
-func (c *Car) SetToFloor(floor int) {
-	return
-}
 
 type CarState struct {
 	floor int
