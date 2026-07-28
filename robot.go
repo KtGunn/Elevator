@@ -17,11 +17,11 @@ const (
 
 var Protocol map[int]string = map[int]string{
 	PCOL_RESERVE: "Reserve",
-	PCOL_LOBBY: "Lobby",
-	PCOL_ATCAR: "Atcar" ,
-	PCOL_INCAR: "Incar",
-	PCOL_OUTCAR: "Outcar",
-	PCOL_DONE: "Done",
+	PCOL_LOBBY:   "Lobby",
+	PCOL_ATCAR:   "Atcar" ,
+	PCOL_INCAR:   "Incar",
+	PCOL_OUTCAR:  "Outcar",
+	PCOL_DONE:    "Done",
 }
 
 
@@ -75,49 +75,43 @@ func NewRobot(name string) *Robot {
 	}
 }
 
-func (r *Robot) AssignCar(car *Car) {
-	r.state.car = car
+func (r *Robot) OnFloor(floor int) {
+	r.state.car = nil
+	r.state.floorNow = floor
 }
 
-func (r *Robot) SetFloorState(state int) {
-	log.Println("@SetFloorState state=", state)
-	r.state.floorState = state
-}
 
-func (r *Robot) Place(floor int, pcol int, side int, dims ElevatorDimensions) {
+func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) bool {
 	log.Println("@Place floor=", floor)
 	
-	x := dims.floor.xPosition(side, pcol)
-	y := dims.floor.yPosition(floor)
+	if r.state.car == nil {
+		Decks.RemoveRobot(r)
+		elev.AddRobot(r.image)
 
-	y += r.dimensions.bodyHeight
-
-	x, y = toCanvasFrame(x,y)
-	r.image.Move(fyne.NewPos(float32(x), float32(y)))
-}
-
-func (r *Robot) positionAt(floor int, dims ElevatorDimensions) (float32, float32) {
-	log.Println("@positionAt floor=", floor)
-
-	floorY := floor*dims.floor.floorHeight + dims.floor.bottomLevel
-	bodyH := float32(r.dimensions.bodyHeight)
-	bodyW := float32(r.dimensions.bodyWidth)
-
-	var x float32
-	switch r.state.floorState {
-	case PCOL_INCAR:
-		log.Println("positionAt INCAR")
-		x = float32(dims.floor.hallLength + dims.floor.lobbyLength)
-	case PCOL_ATCAR:
-		log.Println("positionAt ATCAR")
-		x = float32(dims.floor.hallLength+dims.floor.lobbyLength) - bodyW
-	default:
-		log.Println("positionAt default", r.state.floorState)
-		x = float32(dims.floor.hallLength) + (float32(dims.floor.lobbyLength)-bodyW)/2
+		r.state.car = elev.car
+		r.state.floorNow = floor
 	}
 
-	return x, float32(floorY) + bodyH
+	if pcol == PCOL_DONE {
+		elev.RemoveRobot(r.image)
+
+		r.state.car = nil
+		r.state.floorNow = floor
+
+		return true
+	}
+
+	
+	dims := elev.dimensions.floor
+	x := dims.xPosition(side, pcol)
+	y := dims.yPosition(floor) + r.dimensions.bodyHeight
+	
+	x, y = toCanvasFrame(x,y)
+	r.image.Move(fyne.NewPos(float32(x), float32(y)))
+
+	return false
 }
+
 
 func CreateRobot(name string, dims CarDimensions) *Robot {
 	log.Println("@CreateRobot")

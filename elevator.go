@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
-
+	"fmt"
 	"image/color"
+	"log"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -17,28 +17,23 @@ var (
 	DARK  = color.RGBA{R: 200, G: 200, B: 200, A: 255}
 )
 
-
-
 ///////////////////////////////////////////////////////////
 // LEVEL ('upper case!')
-//
 type Level struct {
-  Number int32
+	Number int32
 	Front  bool
 	Rear   bool
 }
 
-
 //////////////////////////////////////////////////////////////
 // Elevator
-//
 type Elevator struct {
-	bank string
+	bank  string
 	image *fyne.Container
 
-	car *Car
-
 	dimensions ElevatorDimensions
+
+	car    *Car
 	levels []*Level
 }
 
@@ -60,29 +55,30 @@ func (e *Elevator) Dimension(dims fyne.Size, floors int) {
 
 
 func (e *Elevator) Levels(landings []*Landing) {
-	
+
 	e.levels = make([]*Level, 0)
-	
-	landIndex := 0
+
+	landingIndex := 0
 	for pi := 0; pi < e.dimensions.floorsCount; pi++ {
-		
 		done := false
-		for n := landIndex; !done ;landIndex++ {
+
+		for n := landingIndex; !done; landingIndex++ {
 			landing := landings[n]
-			
+
 			if int(landing.Floor) == pi {
+
 				level := &Level{
 					Number: int32(landing.Floor),
-					Front: landing.Door == 0 || landing.Door == 2,
-					Rear:  landing.Door == 2 || landing.Door == 1,
+					Front:  landing.Door == 0 || landing.Door == 2,
+					Rear:   landing.Door == 2 || landing.Door == 1,
 				}
-				
+
 				e.levels = append(e.levels, level)
-				done = true  // advance landIndex
-				
+				done = true // advance landingIndex
+
 			} else {
 				e.levels = append(e.levels, nil)
-				break   // don't advance landIndex
+				break // don't advance landingIndex
 			}
 		}
 	}
@@ -91,36 +87,54 @@ func (e *Elevator) Levels(landings []*Landing) {
 
 func (e *Elevator) Car(car string) {
 	e.car = CreateCar(car, e.dimensions.car)
+	e.image.Add(e.car.image)
 }
+
 
 func (e *Elevator) SetCar(floor int) {
 	x := e.dimensions.floor.xPosition(FRONT_SIDE, PCOL_INCAR)
 	y := e.dimensions.floor.yPosition(floor)
 
-	x -= e.dimensions.car.carLength/2
+	x -= e.dimensions.car.carLength / 2
 	y += e.dimensions.car.boxHeight
-	
-	x, y = toCanvasFrame(x,y)
+
+	x, y = toCanvasFrame(x, y)
 	e.car.image.Move(fyne.NewPos(float32(x), float32(y)))
-
-}
-
-// ElevatorDims
-//
-func ElevatorDims(winDims fyne.Size, floors int) ElevatorDimensions {
-
-	return ElevatorDimensions{}
 }
 
 
-/* NO LONGER NEEDED
-func (e *Elevator) Place(floor int) {
-	log.Println("@Place ElevatorCar: (global)", yOffset)
+func (e *Elevator) RemoveRobot(robot *fyne.Container) {
+	e.image.Remove(robot)
+	e.image.Refresh()
 }
-*/
+
+func (e *Elevator) AddRobot(robot *fyne.Container) {
+	e.image.Add(robot)
+  e.image.Refresh()
+}
+
+// toFront
+// moves the specified object to the very end of the container's list
+func toFront(parent *fyne.Container, target fyne.CanvasObject) {
+	log.Println(" to Front")
+
+	if parent == nil || target == nil {
+		return
+	}
+
+	for i, obj := range parent.Objects {
+		if obj == target {
+			log.Println(" I found the target")
+			parent.Objects = append(parent.Objects[:i], parent.Objects[i+1:]...)
+			parent.Objects = append(parent.Objects, target)
+
+			parent.Refresh()
+			break
+		}
+	}
+}
 
 // Image
-//
 func (e *Elevator) Image(win fyne.Size) {
 
 	e.image = container.NewWithoutLayout()
@@ -131,7 +145,6 @@ func (e *Elevator) Image(win fyne.Size) {
 	imagebox.SetMinSize(win)
 
 	e.image.Add(imagebox)
-
 
 	dims := e.dimensions
 	log.Println("@e.Image dims", e.dimensions)
@@ -144,7 +157,7 @@ func (e *Elevator) Image(win fyne.Size) {
 
 		if level == nil {
 			log.Println("NIL")
-			continue  // a floor this elevator does not service
+			continue // a floor this elevator does not service
 		}
 
 		height := index*dims.floor.floorHeight + dims.floor.bottomLevel
@@ -158,7 +171,6 @@ func (e *Elevator) Image(win fyne.Size) {
 
 	return
 }
-
 
 func CreateFloorObject(yOff int, yLevel int, dims ElevatorDimensions, front bool, rear bool) []fyne.CanvasObject {
 
@@ -208,12 +220,11 @@ func CreateALine(color color.RGBA, yOff int, position fyne.Position, width int, 
 	return anyLine, position
 }
 
-
 // flipVertical
-//   this is a quick coordinates transformation.
-//   Screen coords start at top-left, x  positive right and y position down.
-//   The application sets origin at bottom left, x  positive right and y position UP.
 //
+//	this is a quick coordinates transformation.
+//	Screen coords start at top-left, x  positive right and y position down.
+//	The application sets origin at bottom left, x  positive right and y position UP.
 func flipVertical(height int, pos fyne.Position) fyne.Position {
 	return fyne.Position{
 		X: pos.X,

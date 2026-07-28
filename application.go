@@ -24,20 +24,22 @@ func NewApplication() Application {
 
 var Elevators []*Elevator
 var Robots []*Robot
-
+var Decks *Floors
 var yOffset int
 
 func toCanvasFrame(x int, y int) (int, int) {
 	return x, yOffset - y
 }
 
-func AddFloors(lay *fyne.Container, win fyne.Size) {
+func AddFloors(lay *fyne.Container, win fyne.Size) *Floors{
 	floors := NewFloors()
 	number := NumberOfFloors()
 
 	floors.Dimensions(number, int(win.Width), int(win.Height))
 	floors.Image()
 	lay.Add(floors.image)
+
+	return floors
 }
 
 func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
@@ -49,7 +51,7 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 		Width: windowDims.Width/2,
 		Height: windowDims.Height,
 	}
-	AddFloors(content, fsize)
+	Decks = AddFloors(content, fsize)
 
 	for _, bank := range banks {
 		for _, car := range bank.Cars {
@@ -59,7 +61,6 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 
 			cont := container.NewWithoutLayout()
 			cont.Add(elev.image)
-			cont.Add(elev.car.image)
 			content.Add(cont)
 		}
 	}
@@ -86,11 +87,8 @@ func AddRobots(appLayout *fyne.Container) {
 		robot := CreateRobot(fmt.Sprintf("Tug-%d", n), elev.dimensions.car)
 		Robots = append(Robots, robot)
 
-		robot.AssignCar(elev.car)
-		robot.SetFloorState(PCOL_LOBBY)
-
-		appLayout.Add(robot.image)
-		robot.Place(0, PCOL_RESERVE, FRONT_SIDE, elev.dimensions)
+		Decks.AddRobot(robot, 0)
+		robot.OnFloor(0)
 	}
 }
 
