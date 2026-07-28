@@ -81,24 +81,24 @@ func (r *Robot) OnFloor(floor int) {
 }
 
 
-func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) {
+func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) bool {
 	log.Println("@Place floor=", floor)
 	
 	if r.state.car == nil {
 		Decks.RemoveRobot(r)
 		elev.AddRobot(r.image)
+
+		r.state.car = elev.car
+		r.state.floorNow = floor
 	}
 
 	if pcol == PCOL_DONE {
-		log.Println(" Removing a robot ")
-
 		elev.RemoveRobot(r.image)
-		//Decks.AddRobot(r, floor)
 
 		r.state.car = nil
 		r.state.floorNow = floor
 
-		return
+		return true
 	}
 
 	
@@ -108,6 +108,8 @@ func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) {
 	
 	x, y = toCanvasFrame(x,y)
 	r.image.Move(fyne.NewPos(float32(x), float32(y)))
+
+	return false
 }
 
 

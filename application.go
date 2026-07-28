@@ -61,8 +61,6 @@ func CreateAppInstance(windowDims fyne.Size, banks []*Bank) {
 
 			cont := container.NewWithoutLayout()
 			cont.Add(elev.image)
-			// [ktg 260727] add car to elevator's image
-			//cont.Add(elev.car.image)
 			content.Add(cont)
 		}
 	}
@@ -90,6 +88,7 @@ func AddRobots(appLayout *fyne.Container) {
 		Robots = append(Robots, robot)
 
 		Decks.AddRobot(robot, 0)
+		robot.OnFloor(0)
 	}
 }
 

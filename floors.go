@@ -45,6 +45,7 @@ func (f *Floors) AddRobot(robot *Robot, floor int) {
 	onFloor = append(onFloor, robot)
 	f.occupation[floor] = onFloor
 
+	// 260728 not done here 
 	//robot.OnFloor(floor)
 }
 

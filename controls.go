@@ -163,8 +163,9 @@ func RobotControls(app fyne.App, banks []*Bank,
 			return
 		}
 
-		fmt.Println("R",robotName, "F", floor, "pS", pcolInt)
-		robot.WithElevator(elev, floor, pcolInt, FRONT_SIDE)
+		if robot.WithElevator(elev, floor, pcolInt, FRONT_SIDE) {
+			Decks.AddRobot(robot, floor)
+		}
 
 	})
 	robotSelector.PlaceHolder = "Pick robot"
