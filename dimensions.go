@@ -49,44 +49,52 @@ type FloorDimensions struct {
 //      fHall    fLby   fAtC  InC   rAtC  rLby   rHall
 //   
 const (
-	FRONT_SIDE int = 1
-	REAR_SIDE  int = 2
+	FRONT_SIDE   int = 1
+	REAR_SIDE    int = 2
+	NEITHER_SIDE int = 3
 )
 
 func (d FloorDimensions) yPosition(floor int) int {
 	return d.bottomLevel + floor * d.floorHeight
 }
 
-func (d FloorDimensions) xPosition(side int, pcol int) int {
+func (d FloorDimensions) xPosition(side int, pcol int, offset int) int {
 	
 	var pos int
 	
 	switch pcol {
+
 	case PCOL_RESERVE:
-		pos = d.hallLength/2
+		pos = d.hallLength / 2
+
 	case PCOL_LOBBY:
-		pos = d.hallLength + 2
+		pos = d.hallLength
+
 	case PCOL_OUTCAR:
-		pos = d.hallLength + d.lobbyLength/2
+		pos = d.hallLength + d.lobbyLength / 2 - offset / 2
+
 	case PCOL_ATCAR:
-		pos = d.hallLength + d.lobbyLength-2
+		pos = d.hallLength + d.lobbyLength - offset
+
 	case PCOL_INCAR:
-		log.Println(" -- InCar -- ")
-		pos = d.hallLength + d.lobbyLength + d.carVoid/2
+		pos = d.hallLength + d.lobbyLength + d.carVoid / 2 - offset / 2
+
 	case PCOL_DONE:
 		pos = 5
+
 	default:
 		return 0
 	}
 
 	switch side {
 
-	case FRONT_SIDE:
+	case FRONT_SIDE, NEITHER_SIDE:
 		return pos
 
 	case REAR_SIDE:
 		return 2*(d.hallLength + d.lobbyLength) + d.carVoid - pos
 	}
+
 
 	return 0
 }
@@ -124,7 +132,7 @@ type ElevatorDimensions struct {
 
 
 func (d ElevatorDimensions) xyPosition(floor int, side int, pcol int) (int, int) {
-	x := d.floor.xPosition(side, pcol)
+	x := d.floor.xPosition(side, pcol, 0)
 	y := d.floor.bottomLevel + floor * d.floor.floorHeight
 	return x,y
 }
