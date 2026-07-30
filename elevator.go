@@ -94,6 +94,7 @@ func (e *Elevator) Car(car string) {
 
 
 func (e *Elevator) SetCar(floor int) {
+
 	x := e.dimensions.floor.xPosition(NEITHER_SIDE, PCOL_INCAR, 0)
 	y := e.dimensions.floor.yPosition(floor)
 
@@ -102,8 +103,10 @@ func (e *Elevator) SetCar(floor int) {
 
 	x, y = toCanvasFrame(x, y)
 	e.car.image.Move(fyne.NewPos(float32(x), float32(y)))
+	log.Println("@SetCar floor", floor, "x", x, "y", y, "rider?", e.rider != nil)
 
 	if e.rider != nil {
+		log.Println(" .. have rider -- will notify  .. floor=", floor)
 		e.rider.CarMoved(e.dimensions.floor, floor)
 	}
 }
@@ -111,10 +114,17 @@ func (e *Elevator) SetCar(floor int) {
 
 
 func (e *Elevator) AddRider(rider *Robot) {
-	e.rider = rider
+	if e.rider == nil {
+		log.Println(" .. adding rider ..", e.car.name)
+		e.rider = rider
+	} else {
+		log.Println(" ..  NOT adding rider ..")
+	}
 }
 
 func (e *Elevator) RemoveRobot(robot *fyne.Container) {
+	log.Println(" ..  Removing a rider ..")
+	e.rider = nil
 	e.image.Remove(robot)
 	e.image.Refresh()
 }

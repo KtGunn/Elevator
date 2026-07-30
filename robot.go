@@ -81,24 +81,31 @@ func (r *Robot) OnFloor(floor int) {
 }
 
 
-func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) bool {
+func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) (bool, int) {
 	log.Println("@Place floor=", floor)
 	
 	if r.state.car == nil {
+
 		Decks.RemoveRobot(r)
 		elev.AddRobot(r.image)
-
 		r.state.car = elev.car
 	}
 
-	if pcol == PCOL_DONE {
-		elev.RemoveRobot(r.image)
 
+	if elev.car != r.state.car {
+
+		floor = r.state.floorNow
+		elev = GetElevator(r.state.car.name)
+	}
+
+
+	if pcol == PCOL_DONE {
+
+		elev.RemoveRobot(r.image)
 		r.state.car = nil
-		r.state.floorNow = floor
 		r.state.floorState = pcol
 
-		return true
+		return true, r.state.floorNow // exit on last recorded floor
 	}
 
 	if pcol == PCOL_INCAR {
@@ -109,7 +116,7 @@ func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) bool
 	r.state.floorState = pcol
 	r.image.Move(r.floorPosition(elev.dimensions.floor, floor, pcol, side))
 
-	return false
+	return false, -1
 }
 
 
@@ -119,19 +126,6 @@ func (r *Robot) floorPosition(dims FloorDimensions, floor int, pcol int,side int
 	y := dims.yPosition(floor) + r.dimensions.bodyHeight
 
 	label, _ := Protocol[pcol]
-	
-	switch side {
-
-	case FRONT_SIDE:
-		//x -= r.dimensions.bodyWidth
-
-	case REAR_SIDE:
-		//x += r.dimensions.bodyWidth
-
-	case NEITHER_SIDE: 	// no change
-	
-	}
-
 	log.Println("..pcol", label, "x", x)
 
 	x, y = toCanvasFrame(x,y)
@@ -146,6 +140,7 @@ func (r *Robot) CarMoved(dims FloorDimensions, floor int) {
 		return
 	}
 
+	log.Println("  @CarMoved, floor=", floor)
 	r.state.floorNow = floor
 	r.image.Move(r.floorPosition(dims, floor, PCOL_INCAR, NEITHER_SIDE))
 }

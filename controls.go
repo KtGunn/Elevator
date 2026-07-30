@@ -163,8 +163,9 @@ func RobotControls(app fyne.App, banks []*Bank,
 			return
 		}
 
-		if robot.WithElevator(elev, floor, pcolInt, FRONT_SIDE) {
-			Decks.AddRobot(robot, floor)
+		if gone, outfloor := robot.WithElevator(elev, floor, pcolInt, FRONT_SIDE); gone {
+			Decks.AddRobot(robot, outfloor)
+			//Decks.AddRobot(robot, floor)
 		}
 
 	})
