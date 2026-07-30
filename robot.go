@@ -115,9 +115,25 @@ func (r *Robot) WithElevator(elev *Elevator, floor int, pcol int, side int) bool
 
 func (r *Robot) floorPosition(dims FloorDimensions, floor int, pcol int,side int) fyne.Position {
 
-	x := dims.xPosition(side, pcol)
+	x := dims.xPosition(side, pcol, r.dimensions.bodyWidth)
 	y := dims.yPosition(floor) + r.dimensions.bodyHeight
+
+	label, _ := Protocol[pcol]
 	
+	switch side {
+
+	case FRONT_SIDE:
+		//x -= r.dimensions.bodyWidth
+
+	case REAR_SIDE:
+		//x += r.dimensions.bodyWidth
+
+	case NEITHER_SIDE: 	// no change
+	
+	}
+
+	log.Println("..pcol", label, "x", x)
+
 	x, y = toCanvasFrame(x,y)
 	return fyne.NewPos(float32(x), float32(y))
 }
@@ -131,7 +147,7 @@ func (r *Robot) CarMoved(dims FloorDimensions, floor int) {
 	}
 
 	r.state.floorNow = floor
-	r.image.Move(r.floorPosition(dims, floor, PCOL_INCAR, FRONT_SIDE))
+	r.image.Move(r.floorPosition(dims, floor, PCOL_INCAR, NEITHER_SIDE))
 }
 
 

@@ -94,7 +94,7 @@ func (e *Elevator) Car(car string) {
 
 
 func (e *Elevator) SetCar(floor int) {
-	x := e.dimensions.floor.xPosition(FRONT_SIDE, PCOL_INCAR)
+	x := e.dimensions.floor.xPosition(NEITHER_SIDE, PCOL_INCAR, 0)
 	y := e.dimensions.floor.yPosition(floor)
 
 	x -= e.dimensions.car.carLength / 2
