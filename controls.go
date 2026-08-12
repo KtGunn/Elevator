@@ -20,10 +20,8 @@ func CreateControls(app fyne.App, banks []*Bank) {
 	height := 600
 	win.Resize(fyne.NewSize(float32(width), float32(height)))
 
-	//cabinSide, _, _ := CabinControls(app, banks)
 	cabinSide, cabinSelector, floorSelector := CabinControls(app, banks)
 
-	//robotSide := RobotControls(app, banks)
 	robotSide := RobotControls(app, banks, cabinSelector, floorSelector)
 
 	win.SetContent(container.NewHBox(
@@ -35,6 +33,7 @@ func CreateControls(app fyne.App, banks []*Bank) {
 	win.Show()
 
 }
+
 
 func CabinControls(app fyne.App, banks []*Bank) (*fyne.Container, *widget.Select, *widget.Select) {
 
@@ -165,7 +164,6 @@ func RobotControls(app fyne.App, banks []*Bank,
 
 		if gone, outfloor := robot.WithElevator(elev, floor, pcolInt, FRONT_SIDE); gone {
 			Decks.AddRobot(robot, outfloor)
-			//Decks.AddRobot(robot, floor)
 		}
 
 	})

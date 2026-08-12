@@ -32,12 +32,29 @@ func (f *Floors) AddRobot(robot *Robot, floor int) {
 
 	onFloor := f.occupation[floor]
 
-	x := robot.dimensions.bodyWidth/2 + len(onFloor)*
-		(robot.dimensions.bodyWidth+robot.dimensions.bodyWidth/2)
 	y := floor*f.floorHeight + robot.dimensions.bodyHeight +
 		robot.dimensions.wheelDia/2 + f.bottomLevel
 
-	xp, yp := toCanvasFrame(x, y)
+	slot := 0
+	var xp, yp int
+	for {
+		x := robot.dimensions.bodyWidth/2 + slot*
+			(robot.dimensions.bodyWidth+robot.dimensions.bodyWidth/2)
+		xp, yp = toCanvasFrame(x, y)
+
+		occupied := false
+		for _, r := range onFloor {
+			if r.image.Position().X == float32(xp) {
+				occupied = true
+				break
+			}
+		}
+
+		if !occupied {
+			break
+		}
+		slot++
+	}
 
 	f.image.Add(robot.image)
 	robot.image.Move(fyne.NewPos(float32(xp), float32(yp)))
@@ -45,8 +62,6 @@ func (f *Floors) AddRobot(robot *Robot, floor int) {
 	onFloor = append(onFloor, robot)
 	f.occupation[floor] = onFloor
 
-	// 260728 not done here 
-	//robot.OnFloor(floor)
 }
 
 func (f *Floors) RemoveRobot(robot *Robot) {

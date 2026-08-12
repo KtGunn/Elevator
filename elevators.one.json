@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "B1",
+    "Cars": [
+      {
+        "Name": "Cab1",
+        "Landings": [
+          {
+            "Floor": 0,
+            "Door": 0,
+            "Label": "L1a"
+          },
+          {
+            "Floor": 1,
+            "Door": 0,
+            "Label": "L1b"
+          },
+          {
+            "Floor": 2,
+            "Door": 1,
+            "Label": "L1c"
+          },
+          {
+            "Floor": 3,
+            "Door": 2,
+            "Label": "L1d"
+          }
+        ]
+      }
+    ]
+  }
+]
